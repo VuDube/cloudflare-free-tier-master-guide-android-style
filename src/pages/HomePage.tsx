@@ -18,12 +18,7 @@ export function HomePage() {
       setRecents(response.data.metadata.recents.slice(0, 3));
     }
   };
-  const handleTopicClick = async (id: string) => {
-    const updated = [id, ...recents.filter(rid => rid !== id)].slice(0, 10);
-    setRecents(updated.slice(0, 3));
-    await chatService.updateMetadata({ recents: updated });
-  };
-  const categories: TopicCategory[] = ['Compute', 'Storage', 'AI', 'Network'];
+  const categories: TopicCategory[] = ['Compute', 'Storage', 'AI', 'Network', 'Security', 'DevOps', 'Media'];
   const apps = Object.values(KNOWLEDGE_BASE);
   const container = {
     hidden: { opacity: 0 },
@@ -36,11 +31,23 @@ export function HomePage() {
     hidden: { opacity: 0, scale: 0.8 },
     show: { opacity: 1, scale: 1 }
   };
+  const getCategoryColor = (cat: TopicCategory) => {
+    switch(cat) {
+      case 'Compute': return 'text-blue-500';
+      case 'Storage': return 'text-amber-500';
+      case 'AI': return 'text-purple-500';
+      case 'Network': return 'text-emerald-500';
+      case 'Security': return 'text-red-500';
+      case 'DevOps': return 'text-slate-500';
+      case 'Media': return 'text-pink-500';
+      default: return 'text-muted-foreground';
+    }
+  };
   return (
     <div className="p-6 space-y-10 pb-20 no-scrollbar overflow-y-auto h-full">
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold font-illustrative">Master Guide</h2>
+          <h2 className="text-3xl font-bold font-illustrative text-foreground">Master Guide</h2>
           <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
             OS 2.5
           </div>
@@ -60,7 +67,7 @@ export function HomePage() {
               const topic = KNOWLEDGE_BASE[id];
               if (!topic) return null;
               return (
-                <Link key={id} to={`/topic/${id}`} className="shrink-0" onClick={() => handleTopicClick(id)}>
+                <Link key={id} to={`/topic/${id}`} className="shrink-0">
                   <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 rounded-xl border border-dashed border-muted-foreground/20 hover:bg-muted/60 transition-colors">
                     <IllustrativeIcon iconName={topic.icon} color={topic.color} size={16} className="p-1" />
                     <span className="text-[10px] font-bold truncate max-w-[80px]">{topic.title}</span>
@@ -71,45 +78,47 @@ export function HomePage() {
           </div>
         </section>
       )}
-      {categories.map(cat => (
-        <section key={cat} className="space-y-4">
-          <motion.h3 
-            whileHover={{ x: 5 }}
-            className={cn(
-              "text-[10px] font-bold uppercase tracking-[0.3em] pl-1 cursor-default",
-              cat === 'Compute' ? 'text-blue-500' :
-              cat === 'Storage' ? 'text-amber-500' :
-              cat === 'AI' ? 'text-purple-500' : 'text-emerald-500'
-            )}
-          >
-            {cat} Hub
-          </motion.h3>
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-3 gap-3"
-          >
-            {apps.filter(app => app.category === cat).map((app) => (
-              <motion.div key={app.id} variants={item}>
-                <Link to={`/topic/${app.id}`} onClick={() => handleTopicClick(app.id)}>
-                  <Card className="p-3 flex flex-col items-center justify-center text-center gap-2 hover:bg-accent transition-colors border-dashed border-2 aspect-square group">
-                    <IllustrativeIcon
-                      iconName={app.icon}
-                      color={app.color}
-                      size={24}
-                      className="group-hover:scale-110 transition-transform"
-                    />
-                    <span className="font-bold text-[8px] uppercase tracking-tighter leading-tight">
-                      {app.title.replace('Cloudflare ', '')}
-                    </span>
-                  </Card>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
-      ))}
+      {categories.map(cat => {
+        const catApps = apps.filter(app => app.category === cat);
+        if (catApps.length === 0) return null;
+        return (
+          <section key={cat} className="space-y-4">
+            <motion.h3
+              whileHover={{ x: 5 }}
+              className={cn(
+                "text-[10px] font-bold uppercase tracking-[0.3em] pl-1 cursor-default",
+                getCategoryColor(cat)
+              )}
+            >
+              {cat} Hub
+            </motion.h3>
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-3 gap-3"
+            >
+              {catApps.map((app) => (
+                <motion.div key={app.id} variants={item}>
+                  <Link to={`/topic/${app.id}`}>
+                    <Card className="p-3 flex flex-col items-center justify-center text-center gap-2 hover:bg-accent transition-colors border-dashed border-2 aspect-square group">
+                      <IllustrativeIcon
+                        iconName={app.icon}
+                        color={app.color}
+                        size={24}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span className="font-bold text-[8px] uppercase tracking-tighter leading-tight">
+                        {app.title.replace('Cloudflare ', '')}
+                      </span>
+                    </Card>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </section>
+        );
+      })}
       <div className="text-center pt-8 opacity-20">
         <p className="text-[8px] uppercase font-bold tracking-[0.4em]">Enterprise Reference v2025.04</p>
       </div>
