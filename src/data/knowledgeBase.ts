@@ -1,4 +1,4 @@
-export type TopicCategory = 'Compute' | 'Storage' | 'AI' | 'Network' | 'Security' | 'Media';
+export type TopicCategory = 'Compute' | 'Storage' | 'AI' | 'Network' | 'Security' | 'Media' | 'DevOps';
 export interface TopicDetail {
   id: string;
   title: string;
@@ -106,6 +106,56 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
     },
     related: ['vectorize', 'ai-gateway']
   },
+  vectorize: {
+    id: 'vectorize',
+    title: 'Vectorize',
+    description: 'Global vector database for AI.',
+    icon: 'Hash',
+    color: '#9C27B0',
+    category: 'AI',
+    overview: 'Scalable vector database built on top of Cloudflare network for fast semantic search and RAG.',
+    limits: [
+      '5,000,000 vector dimensions free',
+      '1,000 metadata indexes',
+      '30MB max index size'
+    ],
+    setupSteps: [
+      'wrangler vectorize create my-index',
+      'env.VECTORIZE.insert(vectors)',
+      'env.VECTORIZE.query(queryVector)'
+    ],
+    specs: {
+      'Free Dimensions': '5M',
+      'Query Latency': '<10ms',
+      'Format': 'Standard Vectors'
+    },
+    related: ['ai', 'd1']
+  },
+  'ai-gateway': {
+    id: 'ai-gateway',
+    title: 'AI Gateway',
+    description: 'Observability for AI applications.',
+    icon: 'Activity',
+    color: '#673AB7',
+    category: 'AI',
+    overview: 'Proxy, cache, and monitor your AI requests across multiple providers with a single API.',
+    limits: [
+      '1,000,000 logs monthly',
+      'Unlimited caching',
+      'Rate limiting included'
+    ],
+    setupSteps: [
+      'Create gateway in dashboard',
+      'Update API endpoint to gateway URL',
+      'View logs in real-time'
+    ],
+    specs: {
+      'Monthly Logs': '1M',
+      'Analytics': 'Real-time',
+      'Caching': 'Edge-based'
+    },
+    related: ['ai', 'workers']
+  },
   d1: {
     id: 'd1',
     title: 'D1 Database',
@@ -130,6 +180,30 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
     },
     related: ['workers', 'hyperdrive']
   },
+  hyperdrive: {
+    id: 'hyperdrive',
+    title: 'Hyperdrive',
+    description: 'Database acceleration.',
+    icon: 'Zap',
+    color: '#03A9F4',
+    category: 'Network',
+    overview: 'Make your existing regional databases feel global by accelerating connections from the edge.',
+    limits: [
+      '1 hyperdrive config free',
+      'Standard pooling limits',
+      'Global acceleration'
+    ],
+    setupSteps: [
+      'wrangler hyperdrive create my-config',
+      'Connect via env.HYPERDRIVE.connectionString'
+    ],
+    specs: {
+      'Latent Reduction': 'Up to 50%',
+      'Caching': 'Smart pooling',
+      'Security': 'MTLS Support'
+    },
+    related: ['workers', 'd1']
+  },
   r2: {
     id: 'r2',
     title: 'R2 Storage',
@@ -153,6 +227,31 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       'API': 'S3 Compatible'
     },
     related: ['kv', 'images']
+  },
+  queues: {
+    id: 'queues',
+    title: 'Queues',
+    description: 'Message queuing for Workers.',
+    icon: 'Mail',
+    color: '#FFC107',
+    category: 'DevOps',
+    overview: 'Guaranteed message delivery and asynchronous processing for your global applications.',
+    limits: [
+      '1 million messages free',
+      '10 queues max',
+      '128KB max message size'
+    ],
+    setupSteps: [
+      'wrangler queues create my-queue',
+      'env.MY_QUEUE.send(msg)',
+      'Consumer Workers config'
+    ],
+    specs: {
+      'Monthly Free': '1M msgs',
+      'Max Queues': '10',
+      'Retry Logic': 'Built-in'
+    },
+    related: ['workers', 'd1']
   },
   kv: {
     id: 'kv',
@@ -203,56 +302,6 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       'Security': 'Signed URLs'
     },
     related: ['r2', 'stream']
-  },
-  turnstile: {
-    id: 'turnstile',
-    title: 'Turnstile',
-    description: 'Smart CAPTCHA alternative.',
-    icon: 'ShieldCheck',
-    color: '#F38020',
-    category: 'Security',
-    overview: 'Privacy-first CAPTCHA replacement that provides a seamless user experience while blocking bots.',
-    limits: [
-      'Unlimited challenges',
-      'Unlimited domains',
-      'No hidden bandwidth costs'
-    ],
-    setupSteps: [
-      'Add site in Dashboard',
-      'Insert script tag in head',
-      'Implement server-side validation'
-    ],
-    specs: {
-      'Accessibility': 'WCAG Compliant',
-      'Privacy': 'GDPR Compliant',
-      'Integration': 'Widget or Invisible'
-    },
-    related: ['workers', 'pages']
-  },
-  stream: {
-    id: 'stream',
-    title: 'Cloudflare Stream',
-    description: 'Video streaming infrastructure.',
-    icon: 'PlayCircle',
-    color: '#F38020',
-    category: 'Media',
-    overview: 'Video platform that handles storage, encoding, and player delivery with a single API.',
-    limits: [
-      '100 minutes of video (Trial)',
-      'Adaptive Bitrate included',
-      'Built-in Player'
-    ],
-    setupSteps: [
-      'Upload video via TUS/API',
-      'Get embed code or HLS URL',
-      'Configure signed tokens'
-    ],
-    specs: {
-      'Storage': '100 min (Free)',
-      'Encoding': 'Automatic',
-      'Protocols': 'HLS, DASH'
-    },
-    related: ['images', 'workers']
   }
 };
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
@@ -278,25 +327,18 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     explanation: 'As of the latest 2025 update, Cloudflare Pages supports 500 builds per month on the Free Tier.'
   },
   {
-    id: 'q4',
-    question: 'What is the CPU time limit per request for Workers on the Free Tier?',
-    options: ['10ms', '50ms', '100ms', '500ms'],
-    correctIndex: 0,
-    explanation: 'Free tier workers are limited to 10ms of CPU time, though wall time can be higher for I/O operations.'
-  },
-  {
-    id: 'q5',
-    question: 'What is the daily write limit for Workers KV on the Free Tier?',
-    options: ['100', '1,000', '10,000', '50,000'],
-    correctIndex: 1,
-    explanation: 'Workers KV Free Tier allows for 1,000 writes or deletes per day globally.'
-  },
-  {
-    id: 'q6',
-    question: 'Which service allows you to replace CAPTCHAs with a privacy-first invisible challenge?',
-    options: ['WAF', 'DDoS Protection', 'Turnstile', 'Access'],
+    id: 'q_v1',
+    question: 'How many vector dimensions are included for free in Cloudflare Vectorize?',
+    options: ['1 Million', '2.5 Million', '5 Million', 'Unlimited'],
     correctIndex: 2,
-    explanation: 'Turnstile is Cloudflare’s user-friendly, privacy-preserving alternative to traditional CAPTCHAs.'
+    explanation: 'Vectorize offers 5 million vector dimensions for free to support advanced AI applications.'
+  },
+  {
+    id: 'q_q1',
+    question: 'What is the free monthly message allowance for Cloudflare Queues?',
+    options: ['100,000', '500,000', '1,000,000', '10,000,000'],
+    correctIndex: 2,
+    explanation: 'Cloudflare Queues provides 1 million messages per month for free.'
   }
 ];
 export const CODE_TEMPLATES: CodeTemplate[] = [
@@ -328,24 +370,6 @@ export default app`
     }
     const object = await env.BUCKET.get(key);
     return new Response(object.body);
-  }
-}`
-  },
-  {
-    id: 'ai-chat',
-    title: 'Llama 3 Edge Chat',
-    stack: ['Workers AI', 'Workers'],
-    codeSnippet: `export default {
-  async fetch(request, env) {
-    const response = await env.AI.run(
-      '@cf/meta/llama-3-8b-instruct',
-      {
-        messages: [
-          { role: 'user', content: 'Hello!' }
-        ]
-      }
-    );
-    return Response.json(response);
   }
 }`
   }

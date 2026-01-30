@@ -1,28 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Calculator, Cpu, Database, Brain, RotateCcw } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Calculator, Cpu, Database, Brain, RotateCcw, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 export function CalculatorPage() {
   const [requests, setRequests] = useState(50000);
   const [storage, setStorage] = useState(5);
   const [neurons, setNeurons] = useState(5000);
+  const [isStressTesting, setIsStressTesting] = useState(false);
+  const [stressOffsets, setStressOffsets] = useState({ r: 0, s: 0, n: 0 });
   const limits = {
     requests: 100000,
     storage: 10,
     neurons: 10000
   };
+  useEffect(() => {
+    let interval: number;
+    if (isStressTesting) {
+      interval = window.setInterval(() => {
+        setStressOffsets({
+          r: (Math.random() - 0.5) * 10000,
+          s: (Math.random() - 0.5) * 1,
+          n: (Math.random() - 0.5) * 1000
+        });
+      }, 200);
+    } else {
+      setStressOffsets({ r: 0, s: 0, n: 0 });
+    }
+    return () => clearInterval(interval);
+  }, [isStressTesting]);
   const handleReset = () => {
     setRequests(50000);
     setStorage(5);
     setNeurons(5000);
+    setIsStressTesting(false);
   };
-  const calculateUsage = (val: number, limit: number) => (val / limit) * 100;
-  const requestUsage = calculateUsage(requests, limits.requests);
-  const storageUsage = calculateUsage(storage, limits.storage);
-  const neuronUsage = calculateUsage(neurons, limits.neurons);
+  const calculateUsage = (val: number, limit: number) => Math.min(100, Math.max(0, (val / limit) * 100));
+  const displayRequests = requests + stressOffsets.r;
+  const displayStorage = storage + stressOffsets.s;
+  const displayNeurons = neurons + stressOffsets.n;
+  const requestUsage = calculateUsage(displayRequests, limits.requests);
+  const storageUsage = calculateUsage(displayStorage, limits.storage);
+  const neuronUsage = calculateUsage(displayNeurons, limits.neurons);
   const totalUsage = (requestUsage + storageUsage + neuronUsage) / 3;
   const getProgressColor = (usage: number) => {
     if (usage > 85) return "bg-destructive";
@@ -52,7 +75,13 @@ export function CalculatorPage() {
           </Button>
         </header>
         <section className="space-y-6 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border-2 border-dashed border-primary/20">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Free Tier Load Factor</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Free Tier Load Factor</h3>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="stress-test" className="text-[9px] font-bold uppercase cursor-pointer">Stress Test</Label>
+              <Switch id="stress-test" checked={isStressTesting} onCheckedChange={setIsStressTesting} />
+            </div>
+          </div>
           <div className="space-y-4">
             <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <motion.div
@@ -62,7 +91,10 @@ export function CalculatorPage() {
               />
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold uppercase tracking-widest">Aggregate Capacity</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                {isStressTesting && <Activity className="w-3 h-3 animate-pulse text-destructive" />}
+                Aggregate Capacity
+              </span>
               <span className={cn(
                 "text-lg font-mono font-bold",
                 totalUsage > 85 ? "text-destructive" : totalUsage > 50 ? "text-amber-500" : "text-emerald-500"
@@ -72,7 +104,7 @@ export function CalculatorPage() {
             </div>
           </div>
         </section>
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6">
           <Card className="p-6 space-y-4 border-dashed rounded-3xl bg-background/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -91,9 +123,10 @@ export function CalculatorPage() {
               max={limits.requests}
               step={1000}
               className="py-4"
+              disabled={isStressTesting}
             />
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-muted-foreground">{requests.toLocaleString()} / day</span>
+              <span className="text-muted-foreground">{Math.round(displayRequests).toLocaleString()} / day</span>
               <span className="font-bold">{Math.round(requestUsage)}%</span>
             </div>
           </Card>
@@ -115,9 +148,10 @@ export function CalculatorPage() {
               max={limits.storage}
               step={0.5}
               className="py-4"
+              disabled={isStressTesting}
             />
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-muted-foreground">{storage} GB used</span>
+              <span className="text-muted-foreground">{displayStorage.toFixed(2)} GB used</span>
               <span className="font-bold">{Math.round(storageUsage)}%</span>
             </div>
           </Card>
@@ -139,9 +173,10 @@ export function CalculatorPage() {
               max={limits.neurons}
               step={100}
               className="py-4"
+              disabled={isStressTesting}
             />
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-muted-foreground">{neurons.toLocaleString()} / day</span>
+              <span className="text-muted-foreground">{Math.round(displayNeurons).toLocaleString()} / day</span>
               <span className="font-bold">{Math.round(neuronUsage)}%</span>
             </div>
           </Card>
