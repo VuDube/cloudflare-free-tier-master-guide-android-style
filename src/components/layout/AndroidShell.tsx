@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw, Bell, AlertCircle, Cloud } from 'lucide-react';
+import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw, Bell, AlertCircle, Cloud, Circle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BottomNav } from './BottomNav';
@@ -23,22 +23,22 @@ export function AndroidShell() {
     if (location.pathname.startsWith('/topic/')) {
       const parts = location.pathname.split('/');
       const id = parts[parts.length - 1];
-      return KNOWLEDGE_BASE[id]?.title || 'Brief';
+      return KNOWLEDGE_BASE[id]?.title || 'Knowledge Brief';
     }
     const routes: Record<string, string> = {
-      '/browse': 'Search 2.0',
+      '/browse': 'Feature Explorer',
       '/ai-chat': 'AI Studio',
       '/settings': 'System Settings',
-      '/calculator': 'Quota Calc',
-      '/quizzes': 'Technical Quiz',
-      '/templates': 'Code Lab',
+      '/calculator': 'Quota Analytics',
+      '/quizzes': 'Edge Certification',
+      '/templates': 'Code Lab v2.5',
       '/dashboard': 'Health Deck',
-      '/network': 'Edge Map',
-      '/share': 'Share Link',
-      '/profile': 'User Profile',
-      '/logs': 'System Logs'
+      '/network': 'Edge Map Live',
+      '/share': 'Transfer Link',
+      '/profile': 'Architect Hub',
+      '/logs': 'Kernel Logs'
     };
-    return routes[location.pathname] || 'Knowledge Brief';
+    return routes[location.pathname] || 'System OS';
   };
   const handleSync = () => {
     setIsSyncing(true);
@@ -51,7 +51,7 @@ export function AndroidShell() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center space-y-8 flex flex-col items-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(243,128,32,0.5)]"
@@ -61,7 +61,7 @@ export function AndroidShell() {
           <div className="space-y-4 w-48">
             <h2 className="text-white font-sketchy text-2xl tracking-widest">CF Droid</h2>
             <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
@@ -75,8 +75,8 @@ export function AndroidShell() {
     );
   }
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center p-0 md:p-4 transition-colors duration-500">
-      <div className="w-full max-w-md h-[100dvh] md:h-[850px] bg-background shadow-2xl relative overflow-hidden flex flex-col md:rounded-[3rem] border-[8px] border-slate-900">
+    <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center p-0 md:p-4 transition-colors duration-500 overflow-hidden">
+      <div className="w-full max-w-md h-[100dvh] md:h-[850px] bg-background shadow-2xl relative overflow-hidden flex flex-col md:rounded-[3rem] border-0 md:border-[12px] border-slate-900">
         <AnimatePresence>
           {showNotifs && (
             <motion.div
@@ -90,8 +90,8 @@ export function AndroidShell() {
                   <AlertCircle size={20} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs font-bold uppercase tracking-widest">System Update</p>
-                  <p className="text-[10px] opacity-70">Worker limits reset in 2 hours.</p>
+                  <p className="text-xs font-bold uppercase tracking-widest">Cloud Update</p>
+                  <p className="text-[10px] opacity-70">New Edge points deployed in SFO/LHR.</p>
                 </div>
                 <button onClick={() => setShowNotifs(false)} className="text-[10px] font-bold uppercase text-primary">Dismiss</button>
               </div>
@@ -101,9 +101,10 @@ export function AndroidShell() {
         <div className="h-8 px-6 flex items-center justify-between text-[11px] font-medium bg-background z-50 shrink-0">
           <div className="flex items-center gap-2">
             <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <Circle className="w-1.5 h-1.5 fill-emerald-500 text-emerald-500 animate-pulse ml-1" />
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowNotifs(!showNotifs)} className="relative">
+            <button onClick={() => setShowNotifs(!showNotifs)} className="relative hover:scale-110 transition-transform">
               <Bell className="w-3.5 h-3.5" />
               <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary rounded-full" />
             </button>
@@ -114,25 +115,25 @@ export function AndroidShell() {
         </div>
         <header className={cn(
           "h-16 px-4 flex items-center justify-between gap-4 transition-all duration-300 z-40 shrink-0",
-          isHome ? "bg-background border-b border-dashed" : "bg-primary text-primary-foreground shadow-md"
+          isHome ? "bg-background border-b border-dashed" : "bg-primary text-primary-foreground shadow-lg"
         )}>
           <div className="flex items-center gap-4">
             {isHome ? (
               <AppDrawer>
-                <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors active:scale-90">
                   <Menu className="w-6 h-6" />
                 </button>
               </AppDrawer>
             ) : (
               <button
                 onClick={() => navigate(-1)}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
             )}
             <h1 className={cn(
-              "text-xl font-bold tracking-tight truncate max-w-[200px]",
+              "text-xl font-bold tracking-tight truncate max-w-[220px]",
               isHome ? "text-foreground font-sketchy" : "text-primary-foreground font-illustrative"
             )}>
               {getTitle()}
@@ -142,7 +143,7 @@ export function AndroidShell() {
             <button
               onClick={handleSync}
               className={cn(
-                "p-2 hover:bg-white/10 rounded-full transition-all",
+                "p-2 hover:bg-white/10 rounded-full transition-all active:rotate-180",
                 isSyncing && "animate-spin"
               )}
             >
@@ -150,7 +151,7 @@ export function AndroidShell() {
             </button>
           )}
         </header>
-        <main className="flex-1 overflow-y-auto no-scrollbar relative bg-background">
+        <main className="flex-1 overflow-hidden relative bg-background">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

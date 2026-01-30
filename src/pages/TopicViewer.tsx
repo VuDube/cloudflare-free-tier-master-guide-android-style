@@ -8,16 +8,27 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Copy, ArrowRight, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { chatService } from '@/lib/chat';
 export function TopicViewer() {
   const { topicId } = useParams();
   const topic = topicId ? KNOWLEDGE_BASE[topicId] : null;
   useEffect(() => {
     if (topicId) {
-      const saved = JSON.parse(localStorage.getItem('recent_topics') || '[]');
-      const updated = [topicId, ...saved.filter((id: string) => id !== topicId)].slice(0, 10);
-      localStorage.setItem('recent_topics', JSON.stringify(updated));
+      updateRecentHistory(topicId);
     }
   }, [topicId]);
+  const updateRecentHistory = async (id: string) => {
+    try {
+      const response = await chatService.getMessages();
+      if (response.success && response.data) {
+        const currentRecents = response.data.metadata?.recents || [];
+        const updated = [id, ...currentRecents.filter((rid: string) => rid !== id)].slice(0, 10);
+        await chatService.updateMetadata({ recents: updated });
+      }
+    } catch (error) {
+      console.error('Failed to sync topic history:', error);
+    }
+  };
   if (!topic) {
     return <Navigate to="/" replace />;
   }
