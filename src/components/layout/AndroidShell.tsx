@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate, Outlet, useParams } from 'react-router-dom';
-import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw } from 'lucide-react';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw, Bell, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BottomNav } from './BottomNav';
@@ -11,6 +11,7 @@ export function AndroidShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showNotifs, setShowNotifs] = useState(false);
   const isHome = location.pathname === '/';
   const getTitle = () => {
     if (isHome) return 'CF Droid Guide';
@@ -25,6 +26,9 @@ export function AndroidShell() {
     if (location.pathname === '/calculator') return 'Quota Calc';
     if (location.pathname === '/quizzes') return 'Technical Quiz';
     if (location.pathname === '/templates') return 'Code Lab';
+    if (location.pathname === '/dashboard') return 'Health Deck';
+    if (location.pathname === '/network') return 'Edge Map';
+    if (location.pathname === '/share') return 'Share Link';
     return 'Knowledge Brief';
   };
   const handleSync = () => {
@@ -37,10 +41,38 @@ export function AndroidShell() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center p-0 md:p-4 transition-colors duration-500">
       <div className="w-full max-w-md h-[100dvh] md:h-[850px] bg-background shadow-2xl relative overflow-hidden flex flex-col md:rounded-[3rem] border-[8px] border-slate-900">
+        {/* PWA Notification Drawer */}
+        <AnimatePresence>
+          {showNotifs && (
+            <motion.div
+              initial={{ y: -100 }}
+              animate={{ y: 0 }}
+              exit={{ y: -100 }}
+              className="absolute top-8 left-0 right-0 z-[60] px-4 pt-2"
+            >
+              <div className="bg-slate-900 text-white p-4 rounded-3xl shadow-2xl border border-white/10 flex gap-4 items-center">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                  <AlertCircle size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold uppercase tracking-widest">System Update</p>
+                  <p className="text-[10px] opacity-70">Worker limits reset in 2 hours.</p>
+                </div>
+                <button onClick={() => setShowNotifs(false)} className="text-[10px] font-bold uppercase text-primary">Dismiss</button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* Status Bar */}
         <div className="h-8 px-6 flex items-center justify-between text-[11px] font-medium bg-background z-50 shrink-0">
-          <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowNotifs(!showNotifs)} className="relative">
+              <Bell className="w-3.5 h-3.5" />
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary rounded-full" />
+            </button>
             <Signal className="w-3 h-3" />
             <Wifi className="w-3 h-3" />
             <Battery className="w-3 h-3" />
@@ -85,7 +117,7 @@ export function AndroidShell() {
             </button>
           )}
         </header>
-        {/* Viewport with Transitions */}
+        {/* Viewport */}
         <main className="flex-1 overflow-y-auto no-scrollbar relative bg-background">
           <AnimatePresence mode="wait">
             <motion.div
@@ -100,7 +132,6 @@ export function AndroidShell() {
             </motion.div>
           </AnimatePresence>
         </main>
-        {/* Bottom Navigation */}
         <BottomNav />
         {/* Home Indicator */}
         <div className="h-6 flex justify-center items-center bg-background shrink-0">

@@ -1,21 +1,24 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
 } from "@/components/ui/sheet";
-import { 
-  LayoutGrid, 
-  Calculator, 
-  GraduationCap, 
-  Code2, 
-  Users, 
-  Trash2, 
+import {
+  LayoutGrid,
+  Calculator,
+  GraduationCap,
+  Code2,
+  Users,
+  Trash2,
   RefreshCcw,
-  UserCircle
+  UserCircle,
+  Activity,
+  Globe,
+  Share2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -26,9 +29,12 @@ export function AppDrawer({ children }: AppDrawerProps) {
   const navigate = useNavigate();
   const navItems = [
     { label: 'All Features', icon: LayoutGrid, path: '/browse' },
+    { label: 'System Dashboard', icon: Activity, path: '/dashboard' },
+    { label: 'Global Network', icon: Globe, path: '/network' },
     { label: 'Quota Calculator', icon: Calculator, path: '/calculator' },
     { label: 'Technical Quizzes', icon: GraduationCap, path: '/quizzes' },
     { label: 'Code Templates', icon: Code2, path: '/templates' },
+    { label: 'Share Guide', icon: Share2, path: '/share' },
     { label: 'Community', icon: Users, path: 'https://discord.gg/cloudflare', external: true },
   ];
   const handleNav = (path: string, external = false) => {

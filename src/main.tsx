@@ -20,6 +20,9 @@ import { AndroidShell } from '@/components/layout/AndroidShell'
 import { CalculatorPage } from '@/pages/CalculatorPage'
 import { QuizPage } from '@/pages/QuizPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { NetworkMapPage } from '@/pages/NetworkMapPage'
+import { SharePage } from '@/pages/SharePage'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -58,6 +61,18 @@ const router = createBrowserRouter([
       {
         path: "templates",
         element: <TemplatesPage />,
+      },
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+      },
+      {
+        path: "network",
+        element: <NetworkMapPage />,
+      },
+      {
+        path: "share",
+        element: <SharePage />,
       }
     ]
   }
