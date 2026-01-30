@@ -1,154 +1,312 @@
+export type TopicCategory = 'Compute' | 'Storage' | 'AI' | 'Network';
 export interface TopicDetail {
   id: string;
   title: string;
   description: string;
   icon: string;
   color: string;
+  category: TopicCategory;
   overview: string;
   limits: string[];
   setupSteps: string[];
+  specs?: Record<string, string>;
+  related?: string[];
 }
 export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
   pages: {
     id: 'pages',
     title: 'Cloudflare Pages',
-    description: 'Blazing fast static site hosting with built-in CI/CD.',
+    description: 'Static site hosting with built-in CI/CD.',
     icon: 'Layers',
     color: '#F38020',
-    overview: 'Pages is a JAMstack platform for frontend developers to collaborate and deploy websites. The free tier is incredibly generous, offering unlimited sites and bandwidth.',
+    category: 'Compute',
+    overview: 'Pages is a JAMstack platform for frontend developers. The free tier remains the industry standard for generous limits.',
     limits: [
-      '500 monthly builds',
-      '100 custom domains per project',
+      '500 monthly builds (2025 update)',
       'Unlimited requests & bandwidth',
       '25 MiB max file size',
       '1 concurrent build'
     ],
     setupSteps: [
-      'Connect your Git provider (GitHub/GitLab).',
-      'Select your repository.',
-      'Configure build settings (npm run build, dist folder).',
-      'Deploy!'
-    ]
+      'Connect Git provider.',
+      'Select repository.',
+      'Configure build: npm run build.',
+      'Deploy to *.pages.dev'
+    ],
+    specs: {
+      'Build Limit': '500/mo',
+      'Max Domains': '100',
+      'SSL': 'Automatic',
+      'Functions': 'Workers Integration'
+    },
+    related: ['workers', 'kv']
   },
   workers: {
     id: 'workers',
     title: 'Workers OS',
-    description: 'Deploy serverless code instantly across the globe.',
+    description: 'Serverless code at the edge.',
     icon: 'Cpu',
     color: '#F38020',
-    overview: 'Workers allows you to run JavaScript, Rust, and C++ on Cloudflare\'s edge network. It uses V8 isolates for near-zero cold starts.',
+    category: 'Compute',
+    overview: 'Run JavaScript/Rust globally. 2025 standard for edge computing with 0ms cold starts.',
     limits: [
       '100,000 daily requests',
       '10ms CPU time per request',
-      '1GB KV storage (Read-only)',
-      '30 scripts maximum',
-      'Standard subdomains (*.workers.dev)'
+      'Standard subdomains',
+      '30 scripts max'
     ],
     setupSteps: [
-      'Install Wrangler: npm install -g wrangler',
-      'Run: wrangler init my-worker',
-      'Develop in index.ts',
-      'Run: wrangler deploy'
-    ]
+      'npm install -g wrangler',
+      'wrangler init my-worker',
+      'wrangler deploy'
+    ],
+    specs: {
+      'Daily Quota': '100k requests',
+      'CPU Time': '10ms (Free)',
+      'Memory': '128MB',
+      'Payload': '100MB'
+    },
+    related: ['d1', 'r2', 'kv']
   },
   ai: {
     id: 'ai',
     title: 'Workers AI',
-    description: 'Run machine learning models on the edge.',
+    description: 'Inference on global GPUs.',
     icon: 'Brain',
     color: '#F38020',
-    overview: 'Cloudflare Workers AI allows you to run high-performance AI models (Llama, Whisper, etc.) directly on Cloudflare’s global network of GPUs.',
+    category: 'AI',
+    overview: 'Run Llama 3, Whisper, and SDXL directly on Cloudflare GPUs.',
     limits: [
-      'Daily usage limits apply (Tier-based)',
-      'Varying neuron costs per model',
-      'Access to Llama 3, Mistral, Whisper',
-      'Limit on max input tokens'
+      '10,000 neurons per day (Free)',
+      'Llama 3.1 8B supported',
+      'Rate limits on concurrent runs'
     ],
     setupSteps: [
-      'Create a Worker project.',
-      'Add AI binding to wrangler.toml.',
-      'Use env.AI.run(model, input).',
-      'Deploy and start inferencing.'
-    ]
+      'Add [ai] binding to wrangler.toml',
+      'env.AI.run("@cf/meta/llama-3-8b")',
+      'Deploy'
+    ],
+    specs: {
+      'Daily Neurons': '10k',
+      'Model Access': 'Standard',
+      'Hardware': 'NVIDIA GPUs'
+    },
+    related: ['vectorize', 'ai-gateway']
   },
   d1: {
     id: 'd1',
     title: 'D1 Database',
-    description: 'Serverless SQL database built on SQLite.',
+    description: 'Serverless SQL (SQLite).',
     icon: 'Database',
     color: '#F38020',
-    overview: 'D1 is Cloudflare’s first native serverless SQL database. It allows you to build data-rich applications without the complexity of managing a traditional database.',
+    category: 'Storage',
+    overview: 'Cloudflare native SQL database for edge apps.',
     limits: [
-      '500MB storage per database',
-      '5 million rows per DB',
-      'Unlimited read units',
+      '500MB storage per DB',
+      '5M rows total',
       '100k write units/day'
     ],
     setupSteps: [
-      'Create DB: wrangler d1 create my-db',
-      'Bind in wrangler.toml.',
-      'Define schemas in SQL files.',
-      'Execute: wrangler d1 execute my-db --file=schema.sql'
-    ]
+      'wrangler d1 create my-db',
+      'wrangler d1 execute my-db --file=schema.sql'
+    ],
+    specs: {
+      'Storage': '500MB',
+      'Writes': '100k/day',
+      'Reads': 'Unlimited'
+    },
+    related: ['workers', 'hyperdrive']
   },
   r2: {
     id: 'r2',
     title: 'R2 Storage',
-    description: 'S3-compatible object storage with zero egress fees.',
+    description: 'Zero egress object storage.',
     icon: 'HardDrive',
     color: '#F38020',
-    overview: 'R2 gives you the freedom to create the multi-cloud architectures you desire with an S3-compatible object storage that eliminates egress fees.',
+    category: 'Storage',
+    overview: 'S3-compatible storage without the bandwidth tax.',
     limits: [
-      '10 GB storage per month',
-      '1 million Class A operations/month',
-      '10 million Class B operations/month',
-      'Zero egress (bandwidth) fees'
+      '10 GB / month free',
+      '1M Class A ops',
+      '10M Class B ops'
     ],
     setupSteps: [
-      'Create bucket: wrangler r2 bucket create my-bucket',
-      'Add binding in wrangler.toml.',
-      'Access via env.MY_BUCKET.put() / .get().',
-      'Run: wrangler deploy'
-    ]
-  },
-  kv: {
-    id: 'kv',
-    title: 'Workers KV',
-    description: 'Low-latency key-value data store.',
-    icon: 'Table',
-    color: '#F38020',
-    overview: 'Workers KV is a global, low-latency, key-value data store. It supports exceptionally high read volumes with low latency, making it possible to build highly dynamic APIs.',
-    limits: [
-      '1 GB storage total',
-      '100,000 read operations per day',
-      '1,000 write operations per day',
-      '1,000 delete operations per day'
+      'wrangler r2 bucket create my-bucket',
+      'env.MY_BUCKET.put(key, data)'
     ],
-    setupSteps: [
-      'Create namespace: wrangler kv:namespace create MY_KV',
-      'Copy the ID to your wrangler.toml.',
-      'Use env.MY_KV.get("key") in code.',
-      'Publish with wrangler deploy.'
-    ]
+    specs: {
+      'Capacity': '10GB',
+      'Egress': '$0 (Free)',
+      'API': 'S3 Compatible'
+    },
+    related: ['kv', 'images']
   },
-  do: {
-    id: 'do',
-    title: 'Durable Objects',
-    description: 'Stateful serverless coordination with strong consistency.',
+  hyperdrive: {
+    id: 'hyperdrive',
+    title: 'Hyperdrive',
+    description: 'Connect existing DBs to Workers.',
     icon: 'Zap',
     color: '#F38020',
-    overview: 'Durable Objects provide low-latency storage and coordination for Cloudflare Workers. They are perfect for chat, collaborative editing, or game servers.',
+    category: 'Compute',
+    overview: 'Accelerates database queries from the edge to your existing Postgres/MySQL.',
     limits: [
-      'Free tier includes 1M requests/month',
-      'Free 400,000 GB-seconds of duration',
-      'WebSocket support included',
-      'Requires Paid Plan for higher quotas'
+      '100,000 queries per day',
+      '1 Hyperdrive config free',
+      'Supported: Postgres/MySQL'
     ],
     setupSteps: [
-      'Define a class extending DurableObject.',
-      'Configure [durable_objects] in wrangler.toml.',
-      'Define migrations for new classes.',
-      'Deploy using wrangler deploy.'
-    ]
+      'wrangler hyperdrive create my-config --connection-string="..."',
+      'Bind in wrangler.toml'
+    ],
+    specs: {
+      'Daily Queries': '100k',
+      'Pooling': 'Built-in',
+      'Latency': 'Optimized'
+    },
+    related: ['workers', 'd1']
+  },
+  queues: {
+    id: 'queues',
+    title: 'Queues',
+    description: 'Guaranteed message delivery.',
+    icon: 'Shuffle',
+    color: '#F38020',
+    category: 'Compute',
+    overview: 'Decouple services with a serverless message queue.',
+    limits: [
+      '1 Million operations / month',
+      'Max message size 128KB',
+      'Retention: 4 days'
+    ],
+    setupSteps: [
+      'wrangler queues create my-queue',
+      'env.MY_QUEUE.send(msg)'
+    ],
+    specs: {
+      'Ops/Month': '1M',
+      'Max Message': '128KB',
+      'Retry': 'Configurable'
+    },
+    related: ['workers', 'do']
+  },
+  vectorize: {
+    id: 'vectorize',
+    title: 'Vectorize',
+    description: 'Vector database for AI apps.',
+    icon: 'Box',
+    color: '#F38020',
+    category: 'AI',
+    overview: 'High-performance vector search for RAG and AI applications.',
+    limits: [
+      '5 million vectors storage',
+      '30 million queries / month',
+      'Metadata: 10KB per vector'
+    ],
+    setupSteps: [
+      'wrangler vectorize create my-index --dimensions=768',
+      'env.INDEX.query(vector)'
+    ],
+    specs: {
+      'Storage': '5M Vectors',
+      'Queries': '30M/mo',
+      'Dimensions': 'Up to 1536'
+    },
+    related: ['ai', 'ai-gateway']
+  },
+  images: {
+    id: 'images',
+    title: 'Images',
+    description: 'Optimize & resize images.',
+    icon: 'Image',
+    color: '#F38020',
+    category: 'Network',
+    overview: 'Store, resize, and optimize images at scale.',
+    limits: [
+      '1,000 transformations / month',
+      'Free storage tier included',
+      'WebP/AVIF support'
+    ],
+    setupSteps: [
+      'Upload image via dashboard or API',
+      'Fetch via variant URL'
+    ],
+    specs: {
+      'Transforms': '1k/mo',
+      'Formats': 'WebP, AVIF, PNG',
+      'Delivery': 'Edge Optimized'
+    },
+    related: ['r2', 'streams']
+  },
+  cache: {
+    id: 'cache',
+    title: 'Cache API',
+    description: 'Customize edge caching.',
+    icon: 'CloudRain',
+    color: '#F38020',
+    category: 'Network',
+    overview: 'Direct control over the Cloudflare global CDN cache.',
+    limits: [
+      'Unlimited cache requests',
+      'Purge by tag: Limited on Free',
+      'Tiered Caching: Enabled'
+    ],
+    setupSteps: [
+      'caches.default.put(request, response)',
+      'caches.default.match(request)'
+    ],
+    specs: {
+      'Traffic': 'Unlimited',
+      'TTL': 'Customizable',
+      'Purge': 'Standard'
+    },
+    related: ['pages', 'workers']
+  },
+  streams: {
+    id: 'streams',
+    title: 'Stream',
+    description: 'On-demand video streaming.',
+    icon: 'Play',
+    color: '#F38020',
+    category: 'Network',
+    overview: 'High quality video hosting and streaming with a global player.',
+    limits: [
+      '100 minutes of video free',
+      '1,000 minutes of viewing',
+      'Max file size 1GB'
+    ],
+    setupSteps: [
+      'Upload file via API',
+      'Use Stream Player component'
+    ],
+    specs: {
+      'Storage': '100 mins',
+      'Delivery': 'Adaptive Bitrate',
+      'Player': 'Integrated'
+    },
+    related: ['images', 'r2']
+  },
+  ai_gateway: {
+    id: 'ai_gateway',
+    title: 'AI Gateway',
+    description: 'Observe & cache AI calls.',
+    icon: 'ShieldCheck',
+    color: '#F38020',
+    category: 'AI',
+    overview: 'The control plane for your AI apps. Logs, analytics, and caching for LLM requests.',
+    limits: [
+      '100,000 requests / month',
+      'Logs: 1 week retention',
+      'Cache: Free enabled'
+    ],
+    setupSteps: [
+      'Create gateway in dashboard',
+      'Replace OpenAI URL with Gateway URL'
+    ],
+    specs: {
+      'Requests': '100k/mo',
+      'Observability': 'Real-time',
+      'Providers': 'Multi-LLM'
+    },
+    related: ['ai', 'vectorize']
   }
 };

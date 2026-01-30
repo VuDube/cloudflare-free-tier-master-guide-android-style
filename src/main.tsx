@@ -17,6 +17,18 @@ import { AiChatPage } from '@/pages/AiChatPage'
 import { BrowsePage } from '@/pages/BrowsePage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { AndroidShell } from '@/components/layout/AndroidShell'
+// Placeholder for future specialized tools
+const PlaceholderPage = ({ title }: { title: string }) => (
+  <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-4">
+    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+    </div>
+    <h2 className="text-2xl font-sketchy">{title}</h2>
+    <p className="text-sm text-muted-foreground leading-relaxed">
+      Synchronizing edge nodes for the next-gen {title.toLowerCase()} module. Estimated availability: Phase 3.5.
+    </p>
+  </div>
+);
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -42,6 +54,21 @@ const router = createBrowserRouter([
   {
     path: "/settings",
     element: <AndroidShell><SettingsPage /></AndroidShell>,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/calculator",
+    element: <AndroidShell><PlaceholderPage title="Quota Calculator" /></AndroidShell>,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/quizzes",
+    element: <AndroidShell><PlaceholderPage title="Technical Quiz" /></AndroidShell>,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/templates",
+    element: <AndroidShell><PlaceholderPage title="Code Lab" /></AndroidShell>,
     errorElement: <RouteErrorBoundary />,
   }
 ]);
