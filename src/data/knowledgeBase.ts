@@ -79,7 +79,88 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       'Memory': '128MB',
       'Payload': '100MB'
     },
-    related: ['d1', 'r2', 'kv']
+    related: ['d1', 'r2', 'kv', 'durable-objects']
+  },
+  'durable-objects': {
+    id: 'durable-objects',
+    title: 'Durable Objects',
+    description: 'Stateful compute with consistency.',
+    icon: 'Database',
+    color: '#F38020',
+    category: 'Compute',
+    overview: 'Durable Objects provide low-latency state and coordination for your Workers, enabling real-time features like chat, collaborative editing, and gaming.',
+    limits: [
+      '1,000,000 requests (Shared Free Quota)',
+      '128MB memory per object',
+      'Unlimited storage via State API',
+      'Strict serialization for state'
+    ],
+    setupSteps: [
+      'Define class in Worker script',
+      'Add [durable_objects] to wrangler.toml',
+      'Call env.DO_BINDING.get(id)'
+    ],
+    specs: {
+      'Shared Quota': '1M reqs',
+      'Isolation': 'Single-threaded per ID',
+      'Consistency': 'Strongly Consistent',
+      'Location': 'Sticky placement'
+    },
+    related: ['workers', 'workflows']
+  },
+  workflows: {
+    id: 'workflows',
+    title: 'Workflows',
+    description: 'Stateful orchestration engine.',
+    icon: 'GitBranch',
+    color: '#F38020',
+    category: 'DevOps',
+    overview: 'Workflows (Beta 2025) allows you to build reliable, long-running processes with retries, sleeps, and state persistence across multiple steps.',
+    limits: [
+      'Standard usage (Beta Period)',
+      '7-day max workflow duration',
+      '50 steps per workflow',
+      'Built-in observability'
+    ],
+    setupSteps: [
+      'wrangler workflows create my-flow',
+      'Define steps in workflow class',
+      'Trigger via API or Trigger Binding'
+    ],
+    specs: {
+      'Max Steps': '50',
+      'State': 'Automatic Persistence',
+      'Retries': 'Exponential Backoff',
+      'Context': 'Full Worker Access'
+    },
+    related: ['workers', 'durable-objects', 'queues']
+  },
+  turnstile: {
+    id: 'turnstile',
+    title: 'Turnstile',
+    description: 'Privacy-first smart CAPTCHA.',
+    icon: 'Shield',
+    color: '#F38020',
+    category: 'Security',
+    overview: 'Turnstile is Cloudflare’s smart CAPTCHA alternative. It can be embedded into any website without showing a CAPTCHA to users.',
+    limits: [
+      'Unlimited free for most cases',
+      'Unlimited sitekeys',
+      'Unlimited widgets',
+      'Advanced analytics included'
+    ],
+    setupSteps: [
+      'Generate Sitekey in Dashboard',
+      'Embed JS snippet in frontend',
+      'Verify token on backend API'
+    ],
+    specs: {
+      'Cost': '$0 (Unlimited Free)',
+      'Security': 'Managed Challenge',
+      'Privacy': 'No tracking cookies',
+      'Integrations': 'React, Vue, Plain JS'
+    },
+    related: ['workers', 'ai-gateway']
   },
   ai: {
     id: 'ai',
@@ -327,18 +408,18 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     explanation: 'As of the latest 2025 update, Cloudflare Pages supports 500 builds per month on the Free Tier.'
   },
   {
-    id: 'q_v1',
-    question: 'How many vector dimensions are included for free in Cloudflare Vectorize?',
-    options: ['1 Million', '2.5 Million', '5 Million', 'Unlimited'],
-    correctIndex: 2,
-    explanation: 'Vectorize offers 5 million vector dimensions for free to support advanced AI applications.'
+    id: 'q_do1',
+    question: 'What is the primary difference between a Worker and a Durable Object?',
+    options: ['One is free, one is not', 'One is stateful, one is stateless', 'One uses Rust, one uses JS', 'No difference'],
+    correctIndex: 1,
+    explanation: 'Durable Objects provide a stateful environment with a persistent storage API, unlike standard stateless Workers.'
   },
   {
-    id: 'q_q1',
-    question: 'What is the free monthly message allowance for Cloudflare Queues?',
-    options: ['100,000', '500,000', '1,000,000', '10,000,000'],
+    id: 'q_wf1',
+    question: 'Which service is best for long-running processes with built-in retries and state?',
+    options: ['Cron Triggers', 'Durable Objects', 'Cloudflare Workflows', 'Queues'],
     correctIndex: 2,
-    explanation: 'Cloudflare Queues provides 1 million messages per month for free.'
+    explanation: 'Workflows is designed specifically for stateful orchestration of multi-step processes.'
   }
 ];
 export const CODE_TEMPLATES: CodeTemplate[] = [

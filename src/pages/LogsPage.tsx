@@ -1,35 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Activity, Trash2, Play, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS';
 interface LogEntry {
   id: string;
   timestamp: string;
-  level: LogLevel;
+  level: 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS';
   message: string;
 }
 export function LogsPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mockEvents = [
+    { level: 'INFO', message: "Worker 'auth-router' deployed to 330 nodes." },
+    { level: 'SUCCESS', message: "R2 Bucket 'assets-v2' created successfully." },
+    { level: 'INFO', message: "D1 Database 'users' executed schema migration." },
+    { level: 'WARN', message: "Worker 'image-resizer' CPU threshold (8ms) reached." },
+    { level: 'ERROR', message: "AI Inference 'llama-3' failed: Rate limit exceeded." },
+    { level: 'INFO', message: "KV Namespace 'config-store' write synchronized." },
+    { level: 'INFO', message: "Edge Request: [GET] /api/v1/health from SFO node." }
+  ];
   useEffect(() => {
     if (isPaused) return;
-    const mockEvents: { level: LogLevel; message: string }[] = [
-      { level: 'INFO', message: "Worker 'auth-router' deployed to 330 nodes." },
-      { level: 'SUCCESS', message: "R2 Bucket 'assets-v2' created successfully." },
-      { level: 'INFO', message: "D1 Database 'users' executed schema migration." },
-      { level: 'WARN', message: "Worker 'image-resizer' CPU threshold (8ms) reached." },
-      { level: 'ERROR', message: "AI Inference 'llama-3' failed: Rate limit exceeded." },
-      { level: 'INFO', message: "KV Namespace 'config-store' write synchronized." },
-      { level: 'INFO', message: "Edge Request: [GET] /api/v1/health from SFO node." }
-    ];
     const interval = setInterval(() => {
       const event = mockEvents[Math.floor(Math.random() * mockEvents.length)];
       const newLog: LogEntry = {
-        id: Math.random().toString(36).substring(2, 9),
+        id: Math.random().toString(36).substr(2, 9),
         timestamp: new Date().toLocaleTimeString(),
-        level: event.level,
+        level: event.level as any,
         message: event.message
       };
       setLogs(prev => [...prev.slice(-49), newLog]);
@@ -54,17 +52,17 @@ export function LogsPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
+          <Button 
+            variant="outline" 
+            size="icon" 
             className="rounded-xl border-dashed"
             onClick={() => setIsPaused(!isPaused)}
           >
             {isPaused ? <Play size={16} className="text-emerald-500" /> : <Square size={16} className="text-amber-500" />}
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
+          <Button 
+            variant="outline" 
+            size="icon" 
             className="rounded-xl border-dashed"
             onClick={() => setLogs([])}
           >

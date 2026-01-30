@@ -14,13 +14,16 @@ export class ChatAgent extends Agent<Env, ChatState> {
   private chatHandler?: ChatHandler;
 
   // Initial state for new chat sessions
-  initialState: ChatState = {
-    messages: [],
+  initialState: ChatState = {    messages: [],
     sessionId: crypto.randomUUID(),
     isProcessing: false,
-    model: 'google-ai-studio/gemini-2.5-flash'
+    model: 'google-ai-studio/gemini-2.5-flash',
+    metadata: {
+      recents: [],
+      settings: {},
+      quizScores: []
+    }
   };
-
   /**
    * Initialize chat handler when agent starts
    */
@@ -58,6 +61,11 @@ export class ChatAgent extends Agent<Env, ChatState> {
       if (method === 'POST' && url.pathname === '/model') {
         return this.handleModelUpdate(await request.json());
       }
+      if (method === 'POST' && url.pathname === '/metadata') {
+        const body = await request.json();
+        return this.handleMetadataUpdate(body);
+      }
+
       
       return Response.json({ 
         success: false, 
@@ -238,7 +246,21 @@ export class ChatAgent extends Agent<Env, ChatState> {
     
     return Response.json({ 
       success: true, 
-      data: this.state 
+      data: this.state
+    });
+  }
+
+  /**
+   * Update persistent system metadata
+   */
+  private handleMetadataUpdate(metadata: Record<string, any>): Response {
+    this.setState({
+      ...this.state,
+      metadata: { ...(this.state.metadata || {}), ...metadata }
+    });
+    return Response.json({
+      success: true,
+      data: this.state
     });
   }
 }

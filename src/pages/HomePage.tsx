@@ -6,12 +6,23 @@ import { IllustrativeIcon } from '@/components/ui/illustrative-icon';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Clock } from 'lucide-react';
+import { chatService } from '@/lib/chat';
 export function HomePage() {
   const [recents, setRecents] = useState<string[]>([]);
   useEffect(() => {
-    const saved = localStorage.getItem('recent_topics');
-    if (saved) setRecents(JSON.parse(saved).slice(0, 3));
+    loadRecents();
   }, []);
+  const loadRecents = async () => {
+    const response = await chatService.getMessages();
+    if (response.success && response.data?.metadata?.recents) {
+      setRecents(response.data.metadata.recents.slice(0, 3));
+    }
+  };
+  const handleTopicClick = async (id: string) => {
+    const updated = [id, ...recents.filter(rid => rid !== id)].slice(0, 10);
+    setRecents(updated.slice(0, 3));
+    await chatService.updateMetadata({ recents: updated });
+  };
   const categories: TopicCategory[] = ['Compute', 'Storage', 'AI', 'Network'];
   const apps = Object.values(KNOWLEDGE_BASE);
   const container = {
@@ -49,7 +60,7 @@ export function HomePage() {
               const topic = KNOWLEDGE_BASE[id];
               if (!topic) return null;
               return (
-                <Link key={id} to={`/topic/${id}`} className="shrink-0">
+                <Link key={id} to={`/topic/${id}`} className="shrink-0" onClick={() => handleTopicClick(id)}>
                   <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 rounded-xl border border-dashed border-muted-foreground/20 hover:bg-muted/60 transition-colors">
                     <IllustrativeIcon iconName={topic.icon} color={topic.color} size={16} className="p-1" />
                     <span className="text-[10px] font-bold truncate max-w-[80px]">{topic.title}</span>
@@ -70,7 +81,7 @@ export function HomePage() {
           )}>
             {cat} Hub
           </h3>
-          <motion.div 
+          <motion.div
             variants={container}
             initial="hidden"
             animate="show"
@@ -78,7 +89,7 @@ export function HomePage() {
           >
             {apps.filter(app => app.category === cat).map((app) => (
               <motion.div key={app.id} variants={item}>
-                <Link to={`/topic/${app.id}`}>
+                <Link to={`/topic/${app.id}`} onClick={() => handleTopicClick(app.id)}>
                   <Card className="p-3 flex flex-col items-center justify-center text-center gap-2 hover:bg-accent transition-colors border-dashed border-2 aspect-square group">
                     <IllustrativeIcon
                       iconName={app.icon}

@@ -23,6 +23,8 @@ import { TemplatesPage } from '@/pages/TemplatesPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { NetworkMapPage } from '@/pages/NetworkMapPage'
 import { SharePage } from '@/pages/SharePage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import { LogsPage } from '@/pages/LogsPage'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -73,6 +75,14 @@ const router = createBrowserRouter([
       {
         path: "share",
         element: <SharePage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
+        path: "logs",
+        element: <LogsPage />,
       }
     ]
   }
