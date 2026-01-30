@@ -97,7 +97,24 @@ class ChatService {
       return await response.json();
     } catch (error) {
       console.error('Failed to clear messages:', error);
-      return { success: false, error: 'Failed to clear messages' };
+      return { success: false, error: 'Failed to clear messages' };    }
+  }
+  async updateMetadata(metadata: Record<string, any>): Promise<ChatResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/metadata`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(metadata)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to update metadata:', error);
+      return { success: false, error: 'Failed to update metadata' };
     }
   }
 

@@ -36,6 +36,7 @@ export interface ChatState {
   isProcessing: boolean;
   model: string;
   streamingMessage?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface SessionInfo {
