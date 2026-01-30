@@ -12,6 +12,19 @@ export interface TopicDetail {
   specs?: Record<string, string>;
   related?: string[];
 }
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+export interface CodeTemplate {
+  id: string;
+  title: string;
+  stack: string[];
+  codeSnippet: string;
+}
 export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
   pages: {
     id: 'pages',
@@ -140,173 +153,86 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       'API': 'S3 Compatible'
     },
     related: ['kv', 'images']
-  },
-  hyperdrive: {
-    id: 'hyperdrive',
-    title: 'Hyperdrive',
-    description: 'Connect existing DBs to Workers.',
-    icon: 'Zap',
-    color: '#F38020',
-    category: 'Compute',
-    overview: 'Accelerates database queries from the edge to your existing Postgres/MySQL.',
-    limits: [
-      '100,000 queries per day',
-      '1 Hyperdrive config free',
-      'Supported: Postgres/MySQL'
-    ],
-    setupSteps: [
-      'wrangler hyperdrive create my-config --connection-string="..."',
-      'Bind in wrangler.toml'
-    ],
-    specs: {
-      'Daily Queries': '100k',
-      'Pooling': 'Built-in',
-      'Latency': 'Optimized'
-    },
-    related: ['workers', 'd1']
-  },
-  queues: {
-    id: 'queues',
-    title: 'Queues',
-    description: 'Guaranteed message delivery.',
-    icon: 'Shuffle',
-    color: '#F38020',
-    category: 'Compute',
-    overview: 'Decouple services with a serverless message queue.',
-    limits: [
-      '1 Million operations / month',
-      'Max message size 128KB',
-      'Retention: 4 days'
-    ],
-    setupSteps: [
-      'wrangler queues create my-queue',
-      'env.MY_QUEUE.send(msg)'
-    ],
-    specs: {
-      'Ops/Month': '1M',
-      'Max Message': '128KB',
-      'Retry': 'Configurable'
-    },
-    related: ['workers', 'do']
-  },
-  vectorize: {
-    id: 'vectorize',
-    title: 'Vectorize',
-    description: 'Vector database for AI apps.',
-    icon: 'Box',
-    color: '#F38020',
-    category: 'AI',
-    overview: 'High-performance vector search for RAG and AI applications.',
-    limits: [
-      '5 million vectors storage',
-      '30 million queries / month',
-      'Metadata: 10KB per vector'
-    ],
-    setupSteps: [
-      'wrangler vectorize create my-index --dimensions=768',
-      'env.INDEX.query(vector)'
-    ],
-    specs: {
-      'Storage': '5M Vectors',
-      'Queries': '30M/mo',
-      'Dimensions': 'Up to 1536'
-    },
-    related: ['ai', 'ai-gateway']
-  },
-  images: {
-    id: 'images',
-    title: 'Images',
-    description: 'Optimize & resize images.',
-    icon: 'Image',
-    color: '#F38020',
-    category: 'Network',
-    overview: 'Store, resize, and optimize images at scale.',
-    limits: [
-      '1,000 transformations / month',
-      'Free storage tier included',
-      'WebP/AVIF support'
-    ],
-    setupSteps: [
-      'Upload image via dashboard or API',
-      'Fetch via variant URL'
-    ],
-    specs: {
-      'Transforms': '1k/mo',
-      'Formats': 'WebP, AVIF, PNG',
-      'Delivery': 'Edge Optimized'
-    },
-    related: ['r2', 'streams']
-  },
-  cache: {
-    id: 'cache',
-    title: 'Cache API',
-    description: 'Customize edge caching.',
-    icon: 'CloudRain',
-    color: '#F38020',
-    category: 'Network',
-    overview: 'Direct control over the Cloudflare global CDN cache.',
-    limits: [
-      'Unlimited cache requests',
-      'Purge by tag: Limited on Free',
-      'Tiered Caching: Enabled'
-    ],
-    setupSteps: [
-      'caches.default.put(request, response)',
-      'caches.default.match(request)'
-    ],
-    specs: {
-      'Traffic': 'Unlimited',
-      'TTL': 'Customizable',
-      'Purge': 'Standard'
-    },
-    related: ['pages', 'workers']
-  },
-  streams: {
-    id: 'streams',
-    title: 'Stream',
-    description: 'On-demand video streaming.',
-    icon: 'Play',
-    color: '#F38020',
-    category: 'Network',
-    overview: 'High quality video hosting and streaming with a global player.',
-    limits: [
-      '100 minutes of video free',
-      '1,000 minutes of viewing',
-      'Max file size 1GB'
-    ],
-    setupSteps: [
-      'Upload file via API',
-      'Use Stream Player component'
-    ],
-    specs: {
-      'Storage': '100 mins',
-      'Delivery': 'Adaptive Bitrate',
-      'Player': 'Integrated'
-    },
-    related: ['images', 'r2']
-  },
-  ai_gateway: {
-    id: 'ai_gateway',
-    title: 'AI Gateway',
-    description: 'Observe & cache AI calls.',
-    icon: 'ShieldCheck',
-    color: '#F38020',
-    category: 'AI',
-    overview: 'The control plane for your AI apps. Logs, analytics, and caching for LLM requests.',
-    limits: [
-      '100,000 requests / month',
-      'Logs: 1 week retention',
-      'Cache: Free enabled'
-    ],
-    setupSteps: [
-      'Create gateway in dashboard',
-      'Replace OpenAI URL with Gateway URL'
-    ],
-    specs: {
-      'Requests': '100k/mo',
-      'Observability': 'Real-time',
-      'Providers': 'Multi-LLM'
-    },
-    related: ['ai', 'vectorize']
   }
 };
+export const QUIZ_QUESTIONS: QuizQuestion[] = [
+  {
+    id: 'q1',
+    question: 'What is the daily request limit for the Workers Free plan?',
+    options: ['10,000', '100,000', '1,000,000', 'Unlimited'],
+    correctIndex: 1,
+    explanation: 'Cloudflare Workers Free Tier provides a generous 100,000 requests per day across all scripts.'
+  },
+  {
+    id: 'q2',
+    question: 'Which storage service offers 10GB of capacity for free with zero egress fees?',
+    options: ['KV', 'D1', 'R2', 'Durable Objects'],
+    correctIndex: 2,
+    explanation: 'R2 Storage is designed to eliminate egress bandwidth taxes, offering 10GB for free monthly.'
+  },
+  {
+    id: 'q3',
+    question: 'How many monthly builds are included in the Pages Free Tier (2025 update)?',
+    options: ['100', '250', '500', 'Unlimited'],
+    correctIndex: 2,
+    explanation: 'As of the latest 2025 update, Cloudflare Pages supports 500 builds per month on the Free Tier.'
+  },
+  {
+    id: 'q4',
+    question: 'What is the CPU time limit per request for Workers on the Free Tier?',
+    options: ['10ms', '50ms', '100ms', '500ms'],
+    correctIndex: 0,
+    explanation: 'Free tier workers are limited to 10ms of CPU time, though wall time can be higher for I/O operations.'
+  }
+];
+export const CODE_TEMPLATES: CodeTemplate[] = [
+  {
+    id: 'hono-d1',
+    title: 'Hono + D1 REST API',
+    stack: ['Hono', 'D1', 'Workers'],
+    codeSnippet: `import { Hono } from 'hono'
+const app = new Hono<{ Bindings: { DB: D1Database } }>()
+app.get('/users', async (c) => {
+  const { results } = await c.env.DB.prepare(
+    'SELECT * FROM users LIMIT 10'
+  ).all()
+  return c.json(results)
+})
+export default app`
+  },
+  {
+    id: 'r2-upload',
+    title: 'R2 Image Uploader',
+    stack: ['R2', 'Workers'],
+    codeSnippet: `export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const key = url.pathname.slice(1);
+    if (request.method === 'PUT') {
+      await env.BUCKET.put(key, request.body);
+      return new Response('Uploaded');
+    }
+    const object = await env.BUCKET.get(key);
+    return new Response(object.body);
+  }
+}`
+  },
+  {
+    id: 'ai-chat',
+    title: 'Llama 3 Edge Chat',
+    stack: ['Workers AI', 'Workers'],
+    codeSnippet: `export default {
+  async fetch(request, env) {
+    const response = await env.AI.run(
+      '@cf/meta/llama-3-8b-instruct',
+      {
+        messages: [
+          { role: 'user', content: 'Hello!' }
+        ]
+      }
+    );
+    return Response.json(response);
+  }
+}`
+  }
+];

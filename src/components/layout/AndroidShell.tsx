@@ -1,11 +1,11 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Battery, Wifi, Signal, ChevronLeft, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BottomNav } from './BottomNav';
 import { AppDrawer } from './AppDrawer';
-export function AndroidShell({ children }: { children: React.ReactNode }) {
+export function AndroidShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
@@ -63,13 +63,13 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              initial={{ x: '10%' , opacity: 0 }}
+              initial={{ x: '10%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '-10%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="absolute inset-0 w-full h-full"
             >
-              {children}
+              <Outlet />
             </motion.div>
           </AnimatePresence>
         </main>
