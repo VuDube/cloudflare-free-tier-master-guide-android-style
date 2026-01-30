@@ -1,13 +1,25 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Battery, Wifi, Signal, ChevronLeft } from 'lucide-react';
+import { Battery, Wifi, Signal, ChevronLeft, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BottomNav } from './BottomNav';
+import { AppDrawer } from './AppDrawer';
 export function AndroidShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
+  const getTitle = () => {
+    if (isHome) return 'CF Droid Guide';
+    if (location.pathname.startsWith('/topic/')) return 'Knowledge Brief';
+    if (location.pathname === '/browse') return 'Search 2.0';
+    if (location.pathname === '/ai-chat') return 'AI Studio';
+    if (location.pathname === '/settings') return 'System Settings';
+    if (location.pathname === '/calculator') return 'Quota Calc';
+    if (location.pathname === '/quizzes') return 'Technical Quiz';
+    if (location.pathname === '/templates') return 'Code Lab';
+    return 'Knowledge Brief';
+  };
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center p-0 md:p-4 transition-colors duration-500">
       <div className="w-full max-w-md h-[100dvh] md:h-[850px] bg-background shadow-2xl relative overflow-hidden flex flex-col md:rounded-[3rem] border-[8px] border-slate-900">
@@ -23,9 +35,15 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
         {/* App Bar / Header */}
         <header className={cn(
           "h-16 px-4 flex items-center gap-4 transition-all duration-300 z-40 shrink-0",
-          isHome ? "bg-background" : "bg-primary text-primary-foreground shadow-md"
+          isHome ? "bg-background border-b border-dashed" : "bg-primary text-primary-foreground shadow-md"
         )}>
-          {!isHome && (
+          {isHome ? (
+            <AppDrawer>
+              <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <Menu className="w-6 h-6" />
+              </button>
+            </AppDrawer>
+          ) : (
             <button
               onClick={() => navigate(-1)}
               className="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -37,7 +55,7 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
             "text-xl font-bold tracking-tight",
             isHome ? "text-foreground font-sketchy" : "text-primary-foreground font-illustrative"
           )}>
-            {isHome ? 'CF Droid Guide' : 'Knowledge Brief'}
+            {getTitle()}
           </h1>
         </header>
         {/* Viewport with Transitions */}
@@ -45,9 +63,9 @@ export function AndroidShell({ children }: { children: React.ReactNode }) {
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
+              initial={{ x: '10%' , opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-10%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="absolute inset-0 w-full h-full"
             >

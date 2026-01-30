@@ -1,48 +1,103 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { KNOWLEDGE_BASE } from '@/data/knowledgeBase';
+import { KNOWLEDGE_BASE, TopicCategory } from '@/data/knowledgeBase';
 import { IllustrativeIcon } from '@/components/ui/illustrative-icon';
 import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 export function HomePage() {
+  const [recents, setRecents] = useState<string[]>([]);
+  useEffect(() => {
+    const saved = localStorage.getItem('recent_topics');
+    if (saved) setRecents(JSON.parse(saved).slice(0, 3));
+  }, []);
+  const categories: TopicCategory[] = ['Compute', 'Storage', 'AI', 'Network'];
   const apps = Object.values(KNOWLEDGE_BASE);
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+  const item = {
+    hidden: { opacity: 0, scale: 0.8 },
+    show: { opacity: 1, scale: 1 }
+  };
   return (
-    <div className="p-6 space-y-8">
-      <section className="space-y-2">
-        <h2 className="text-3xl font-bold font-illustrative">Welcome, Builder</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          Master the Cloudflare Free Tier ecosystem with this interactive technical manual.
+    <div className="p-6 space-y-10 pb-20 no-scrollbar overflow-y-auto h-full">
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold font-illustrative">Master Guide</h2>
+          <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+            OS 2.5
+          </div>
+        </div>
+        <p className="text-muted-foreground text-xs leading-relaxed max-w-[280px]">
+          Comprehensive 2025 technical manual for Cloudflare's free tier architecture.
         </p>
       </section>
-      <div className="grid grid-cols-2 gap-4">
-        {apps.map((app, index) => (
-          <motion.div
-            key={app.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+      {recents.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock size={14} />
+            <h3 className="text-[10px] font-bold uppercase tracking-widest">Recently Viewed</h3>
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
+            {recents.map(id => {
+              const topic = KNOWLEDGE_BASE[id];
+              if (!topic) return null;
+              return (
+                <Link key={id} to={`/topic/${id}`} className="shrink-0">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 rounded-xl border border-dashed border-muted-foreground/20 hover:bg-muted/60 transition-colors">
+                    <IllustrativeIcon iconName={topic.icon} color={topic.color} size={16} className="p-1" />
+                    <span className="text-[10px] font-bold truncate max-w-[80px]">{topic.title}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+      {categories.map(cat => (
+        <section key={cat} className="space-y-4">
+          <h3 className={cn(
+            "text-[10px] font-bold uppercase tracking-[0.3em] pl-1",
+            cat === 'Compute' ? 'text-blue-500' :
+            cat === 'Storage' ? 'text-amber-500' :
+            cat === 'AI' ? 'text-purple-500' : 'text-emerald-500'
+          )}>
+            {cat} Hub
+          </h3>
+          <motion.div 
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-3 gap-3"
           >
-            <Link to={`/topic/${app.id}`}>
-              <Card className="p-4 flex flex-col items-center justify-center text-center gap-3 hover:bg-accent transition-colors border-dashed border-2 aspect-square">
-                <IllustrativeIcon 
-                  iconName={app.icon} 
-                  color={app.color} 
-                  size={32} 
-                />
-                <span className="font-bold text-xs uppercase tracking-wider">{app.title}</span>
-              </Card>
-            </Link>
+            {apps.filter(app => app.category === cat).map((app) => (
+              <motion.div key={app.id} variants={item}>
+                <Link to={`/topic/${app.id}`}>
+                  <Card className="p-3 flex flex-col items-center justify-center text-center gap-2 hover:bg-accent transition-colors border-dashed border-2 aspect-square group">
+                    <IllustrativeIcon
+                      iconName={app.icon}
+                      color={app.color}
+                      size={24}
+                      className="group-hover:scale-110 transition-transform"
+                    />
+                    <span className="font-bold text-[8px] uppercase tracking-tighter leading-tight">
+                      {app.title.replace('Cloudflare ', '')}
+                    </span>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
-        ))}
-      </div>
-      <div className="mt-8 p-4 bg-muted/50 rounded-2xl border border-dashed border-muted-foreground/30">
-        <h3 className="font-illustrative text-lg mb-2 underline decoration-primary underline-offset-4">Pro Tip</h3>
-        <p className="text-2xs text-muted-foreground">
-          Workers AI now supports Llama 3 on the free tier! Use it for edge-based classification without external API costs.
-        </p>
-      </div>
-      <div className="text-center pt-8 opacity-40">
-        <p className="text-[10px] uppercase font-bold tracking-[0.2em]">Cloudflare Free Tier Master Guide</p>
+        </section>
+      ))}
+      <div className="text-center pt-8 opacity-20">
+        <p className="text-[8px] uppercase font-bold tracking-[0.4em]">Enterprise Reference v2025.04</p>
       </div>
     </div>
   );
