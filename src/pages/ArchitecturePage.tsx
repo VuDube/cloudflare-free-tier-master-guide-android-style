@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Network, User, Server, Database, Globe, ArrowRight, Zap, Info } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +11,14 @@ export function ArchitecturePage() {
     { id: 'worker', label: 'Worker OS', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10', description: 'Serverless logic executes in V8 isolates.' },
     { id: 'storage', label: 'Persistent State', icon: Database, color: 'text-emerald-500', bg: 'bg-emerald-500/10', description: 'R2, D1, or KV storage access.' }
   ];
-  const packetVariants = {
+  const packetVariants: Variants = {
     animate: {
       left: ['0%', '33%', '66%', '100%'],
-      transition: { duration: 4, repeat: Infinity, ease: 'linear' }
+      transition: { 
+        duration: 4, 
+        repeat: Infinity, 
+        ease: 'linear' as const 
+      }
     }
   };
   return (
@@ -28,12 +32,12 @@ export function ArchitecturePage() {
       </header>
       <div className="flex-1 space-y-12">
         <div className="relative h-24 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border-4 border-dashed border-slate-200 dark:border-slate-800">
-          <motion.div 
+          <motion.div
             variants={packetVariants}
             animate="animate"
             className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-[0_0_15px_rgba(243,128,32,0.8)] z-10"
           />
-          {nodes.map((node, idx) => (
+          {nodes.map((node) => (
             <div key={node.id} className="relative z-20 flex flex-col items-center gap-2">
               <button
                 onClick={() => setActiveNode(activeNode === node.id ? null : node.id)}

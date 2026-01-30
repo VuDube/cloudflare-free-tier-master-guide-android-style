@@ -22,9 +22,12 @@ export function AiChatPage() {
   useEffect(() => { loadMessages(); }, []);
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: isTyping ? 'auto' : 'smooth'
+      });
     }
-  }, [messages, streamingResponse]);
+  }, [messages, streamingResponse, isTyping]);
   const loadMessages = async () => {
     const response = await chatService.getMessages();
     if (response.success && response.data) setMessages(response.data.messages);
@@ -37,14 +40,22 @@ export function AiChatPage() {
     setIsTyping(true);
     setStreamingResponse('');
     const personaPrompt = personas.find(p => p.name === persona)?.prompt || '';
-    const fullMessage = `${personaPrompt}\nUser question: ${userMessage}`;
-    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', content: userMessage, timestamp: Date.now() }]);
+    const fullMessage = `Persona Context: ${personaPrompt}\n\nUser Question: ${userMessage}`;
+    // Optimistic UI update
+    setMessages(prev => [...prev, { 
+      id: crypto.randomUUID(), 
+      role: 'user', 
+      content: userMessage, 
+      timestamp: Date.now() 
+    }]);
     try {
       await chatService.sendMessage(fullMessage, undefined, (chunk) => {
         setStreamingResponse(prev => prev + chunk);
       });
       await loadMessages();
       setStreamingResponse('');
+    } catch (err) {
+      console.error('Chat error:', err);
     } finally {
       setIsTyping(false);
     }
@@ -75,7 +86,7 @@ export function AiChatPage() {
           {['D1', 'KV', 'AI'].map(t => <span key={t} className="text-[8px] font-bold text-amber-600 border border-amber-600/30 px-1 rounded">{t}</span>)}
         </div>
       </div>
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth">
         {messages.length === 0 && !isTyping && (
           <div className="h-full flex flex-col items-center justify-center text-center opacity-40 space-y-6">
             <Bot size={64} className="text-primary animate-pulse" />
@@ -111,11 +122,20 @@ export function AiChatPage() {
       </div>
       <div className="p-4 bg-background border-t">
         <form onSubmit={(e) => handleSend(undefined, e)} className="flex gap-2 items-center">
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Consult ${persona}...`} className="rounded-full bg-slate-100 dark:bg-slate-900 border-none px-6 focus-visible:ring-primary h-12" disabled={isTyping} />
+          <Input 
+            value={input} 
+            onChange={(e) => setInput(e.target.value)} 
+            placeholder={`Consult ${persona}...`} 
+            className="rounded-full bg-slate-100 dark:bg-slate-900 border-none px-6 focus-visible:ring-primary h-12" 
+            disabled={isTyping} 
+          />
           <Button type="submit" size="icon" className="rounded-full shrink-0 h-12 w-12" disabled={!input.trim() || isTyping}>
             <Send size={20} />
           </Button>
         </form>
+      </div>
+      <div className="px-4 py-2 bg-muted/20 text-center border-t">
+        <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest">Note: AI capacity is subject to shared quota limits.</p>
       </div>
     </div>
   );
