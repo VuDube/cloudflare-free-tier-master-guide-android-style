@@ -2,7 +2,7 @@
 
 A production-ready template for building AI-powered chat applications on Cloudflare Workers. Features multi-session conversations powered by Durable Objects, streaming responses, tool calling (web search, weather, MCP integration), and a modern React frontend with shadcn/ui.
 
-[![[cloudflarebutton]]](https://deploy.workers.cloudflare.com/)
+[![[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/VuDube/cloudflare-free-tier-master-guide-android-style)]](https://deploy.workers.cloudflare.com/)
 
 ## ✨ Key Features
 
@@ -110,7 +110,7 @@ bun deploy
 
 Or use the button:
 
-[![[cloudflarebutton]]](https://deploy.workers.cloudflare.com/)
+[![[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/VuDube/cloudflare-free-tier-master-guide-android-style)]](https://deploy.workers.cloudflare.com/)
 
 **Custom Domain**: Add via Cloudflare Dashboard > Workers > Your Worker > Triggers > Custom Domain.
 
