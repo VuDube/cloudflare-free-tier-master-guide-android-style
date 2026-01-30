@@ -29,6 +29,7 @@ export function AppDrawer({ children }: AppDrawerProps) {
     try {
       await chatService.clearAllSessions();
       await chatService.clearMessages();
+      localStorage.removeItem('cf_droid_session_id');
       toast.success('System state wiped successfully');
       navigate('/');
       window.location.reload();
