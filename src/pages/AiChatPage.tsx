@@ -135,7 +135,7 @@ export function AiChatPage() {
         </form>
       </div>
       <div className="px-4 py-2 bg-muted/20 text-center border-t">
-        <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest">Note: AI capacity is subject to shared quota limits.</p>
+        <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-widest leading-relaxed px-4">Note: although this project has AI capabilities, There is a limit on the number of requests that can be made to the AI servers across all user apps in a given time period.</p>
       </div>
     </div>
   );
