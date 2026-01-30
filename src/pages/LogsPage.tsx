@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Activity, Trash2, Play, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS';
 interface LogEntry {
   id: string;
   timestamp: string;
-  level: 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS';
+  level: LogLevel;
   message: string;
 }
 export function LogsPage() {
@@ -14,7 +15,7 @@ export function LogsPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isPaused) return;
-    const mockEvents = [
+    const mockEvents: { level: LogLevel; message: string }[] = [
       { level: 'INFO', message: "Worker 'auth-router' deployed to 330 nodes." },
       { level: 'SUCCESS', message: "R2 Bucket 'assets-v2' created successfully." },
       { level: 'INFO', message: "D1 Database 'users' executed schema migration." },
@@ -28,7 +29,7 @@ export function LogsPage() {
       const newLog: LogEntry = {
         id: Math.random().toString(36).substring(2, 9),
         timestamp: new Date().toLocaleTimeString(),
-        level: event.level as any,
+        level: event.level,
         message: event.message
       };
       setLogs(prev => [...prev.slice(-49), newLog]);
