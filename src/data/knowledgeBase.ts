@@ -1,4 +1,4 @@
-export type TopicCategory = 'Compute' | 'Storage' | 'AI' | 'Network';
+export type TopicCategory = 'Compute' | 'Storage' | 'AI' | 'Network' | 'Security' | 'Media';
 export interface TopicDetail {
   id: string;
   title: string;
@@ -153,6 +153,106 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       'API': 'S3 Compatible'
     },
     related: ['kv', 'images']
+  },
+  kv: {
+    id: 'kv',
+    title: 'Workers KV',
+    description: 'Global key-value store.',
+    icon: 'Zap',
+    color: '#F38020',
+    category: 'Storage',
+    overview: 'High-read, low-latency global key-value store optimized for configuration and routing data.',
+    limits: [
+      '1 GB total storage',
+      '100,000 reads per day',
+      '1,000 writes/deletes per day'
+    ],
+    setupSteps: [
+      'wrangler kv:namespace create MY_KV',
+      'env.MY_KV.put("key", "value")',
+      'await env.MY_KV.get("key")'
+    ],
+    specs: {
+      'Read Limit': '100k/day',
+      'Write Limit': '1k/day',
+      'Max Value Size': '25MB'
+    },
+    related: ['workers', 'r2']
+  },
+  images: {
+    id: 'images',
+    title: 'Cloudflare Images',
+    description: 'Image optimization and delivery.',
+    icon: 'Image',
+    color: '#F38020',
+    category: 'Media',
+    overview: 'End-to-end solution for resizing, optimizing, and delivering images at scale.',
+    limits: [
+      '1,000 images free (Trial)',
+      'Unlimited transformations',
+      'Delivery included in bandwidth'
+    ],
+    setupSteps: [
+      'Enable Images in dashboard',
+      'Upload image via API or Dashboard',
+      'Use variants for responsive sizes'
+    ],
+    specs: {
+      'Storage Limit': '1k images',
+      'Format Support': 'WebP, AVIF',
+      'Security': 'Signed URLs'
+    },
+    related: ['r2', 'stream']
+  },
+  turnstile: {
+    id: 'turnstile',
+    title: 'Turnstile',
+    description: 'Smart CAPTCHA alternative.',
+    icon: 'ShieldCheck',
+    color: '#F38020',
+    category: 'Security',
+    overview: 'Privacy-first CAPTCHA replacement that provides a seamless user experience while blocking bots.',
+    limits: [
+      'Unlimited challenges',
+      'Unlimited domains',
+      'No hidden bandwidth costs'
+    ],
+    setupSteps: [
+      'Add site in Dashboard',
+      'Insert script tag in head',
+      'Implement server-side validation'
+    ],
+    specs: {
+      'Accessibility': 'WCAG Compliant',
+      'Privacy': 'GDPR Compliant',
+      'Integration': 'Widget or Invisible'
+    },
+    related: ['workers', 'pages']
+  },
+  stream: {
+    id: 'stream',
+    title: 'Cloudflare Stream',
+    description: 'Video streaming infrastructure.',
+    icon: 'PlayCircle',
+    color: '#F38020',
+    category: 'Media',
+    overview: 'Video platform that handles storage, encoding, and player delivery with a single API.',
+    limits: [
+      '100 minutes of video (Trial)',
+      'Adaptive Bitrate included',
+      'Built-in Player'
+    ],
+    setupSteps: [
+      'Upload video via TUS/API',
+      'Get embed code or HLS URL',
+      'Configure signed tokens'
+    ],
+    specs: {
+      'Storage': '100 min (Free)',
+      'Encoding': 'Automatic',
+      'Protocols': 'HLS, DASH'
+    },
+    related: ['images', 'workers']
   }
 };
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
@@ -183,6 +283,20 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     options: ['10ms', '50ms', '100ms', '500ms'],
     correctIndex: 0,
     explanation: 'Free tier workers are limited to 10ms of CPU time, though wall time can be higher for I/O operations.'
+  },
+  {
+    id: 'q5',
+    question: 'What is the daily write limit for Workers KV on the Free Tier?',
+    options: ['100', '1,000', '10,000', '50,000'],
+    correctIndex: 1,
+    explanation: 'Workers KV Free Tier allows for 1,000 writes or deletes per day globally.'
+  },
+  {
+    id: 'q6',
+    question: 'Which service allows you to replace CAPTCHAs with a privacy-first invisible challenge?',
+    options: ['WAF', 'DDoS Protection', 'Turnstile', 'Access'],
+    correctIndex: 2,
+    explanation: 'Turnstile is Cloudflare’s user-friendly, privacy-preserving alternative to traditional CAPTCHAs.'
   }
 ];
 export const CODE_TEMPLATES: CodeTemplate[] = [
