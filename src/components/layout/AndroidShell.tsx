@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw, Bell, AlertCircle } from 'lucide-react';
+import { Battery, Wifi, Signal, ChevronLeft, Menu, RefreshCw, Bell, AlertCircle, Cloud } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BottomNav } from './BottomNav';
@@ -12,7 +12,12 @@ export function AndroidShell() {
   const navigate = useNavigate();
   const [isSyncing, setIsSyncing] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [isBooting, setIsBooting] = useState(true);
   const isHome = location.pathname === '/';
+  useEffect(() => {
+    const timer = setTimeout(() => setIsBooting(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
   const getTitle = () => {
     if (isHome) return 'CF Droid Guide';
     if (location.pathname.startsWith('/topic/')) {
@@ -20,16 +25,20 @@ export function AndroidShell() {
       const id = parts[parts.length - 1];
       return KNOWLEDGE_BASE[id]?.title || 'Brief';
     }
-    if (location.pathname === '/browse') return 'Search 2.0';
-    if (location.pathname === '/ai-chat') return 'AI Studio';
-    if (location.pathname === '/settings') return 'System Settings';
-    if (location.pathname === '/calculator') return 'Quota Calc';
-    if (location.pathname === '/quizzes') return 'Technical Quiz';
-    if (location.pathname === '/templates') return 'Code Lab';
-    if (location.pathname === '/dashboard') return 'Health Deck';
-    if (location.pathname === '/network') return 'Edge Map';
-    if (location.pathname === '/share') return 'Share Link';
-    return 'Knowledge Brief';
+    const routes: Record<string, string> = {
+      '/browse': 'Search 2.0',
+      '/ai-chat': 'AI Studio',
+      '/settings': 'System Settings',
+      '/calculator': 'Quota Calc',
+      '/quizzes': 'Technical Quiz',
+      '/templates': 'Code Lab',
+      '/dashboard': 'Health Deck',
+      '/network': 'Edge Map',
+      '/share': 'Share Link',
+      '/profile': 'User Profile',
+      '/logs': 'System Logs'
+    };
+    return routes[location.pathname] || 'Knowledge Brief';
   };
   const handleSync = () => {
     setIsSyncing(true);
@@ -38,10 +47,36 @@ export function AndroidShell() {
       toast.success('System database synchronized');
     }, 1200);
   };
+  if (isBooting) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-8 flex flex-col items-center">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(243,128,32,0.5)]"
+          >
+            <Cloud className="text-white w-16 h-16" />
+          </motion.div>
+          <div className="space-y-4 w-48">
+            <h2 className="text-white font-sketchy text-2xl tracking-widest">CF Droid</h2>
+            <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                className="h-full w-1/2 bg-primary"
+              />
+            </div>
+            <p className="text-[10px] text-slate-500 font-mono uppercase tracking-[0.3em]">Kernel v2.5 Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center p-0 md:p-4 transition-colors duration-500">
       <div className="w-full max-w-md h-[100dvh] md:h-[850px] bg-background shadow-2xl relative overflow-hidden flex flex-col md:rounded-[3rem] border-[8px] border-slate-900">
-        {/* PWA Notification Drawer */}
         <AnimatePresence>
           {showNotifs && (
             <motion.div
@@ -63,7 +98,6 @@ export function AndroidShell() {
             </motion.div>
           )}
         </AnimatePresence>
-        {/* Status Bar */}
         <div className="h-8 px-6 flex items-center justify-between text-[11px] font-medium bg-background z-50 shrink-0">
           <div className="flex items-center gap-2">
             <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -78,7 +112,6 @@ export function AndroidShell() {
             <Battery className="w-3 h-3" />
           </div>
         </div>
-        {/* App Bar / Header */}
         <header className={cn(
           "h-16 px-4 flex items-center justify-between gap-4 transition-all duration-300 z-40 shrink-0",
           isHome ? "bg-background border-b border-dashed" : "bg-primary text-primary-foreground shadow-md"
@@ -117,7 +150,6 @@ export function AndroidShell() {
             </button>
           )}
         </header>
-        {/* Viewport */}
         <main className="flex-1 overflow-y-auto no-scrollbar relative bg-background">
           <AnimatePresence mode="wait">
             <motion.div
@@ -133,7 +165,6 @@ export function AndroidShell() {
           </AnimatePresence>
         </main>
         <BottomNav />
-        {/* Home Indicator */}
         <div className="h-6 flex justify-center items-center bg-background shrink-0">
           <div className="w-24 h-1 bg-muted-foreground/20 rounded-full" />
         </div>

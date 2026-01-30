@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { chatService } from '@/lib/chat';
+import { toast } from 'sonner';
 interface AppDrawerProps {
   children?: React.ReactNode;
 }
@@ -47,6 +49,23 @@ export function AppDrawer({ children }: AppDrawerProps) {
     } else {
       navigate(path);
     }
+  };
+  const handleWipeState = async () => {
+    try {
+      await chatService.clearAllSessions();
+      await chatService.clearMessages();
+      toast.success('System state wiped successfully');
+      navigate('/');
+      window.location.reload();
+    } catch (error) {
+      toast.error('Failed to wipe system state');
+    }
+  };
+  const handleReboot = () => {
+    toast.info('Initiating hard reboot...');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
   return (
     <Sheet>
@@ -84,11 +103,11 @@ export function AppDrawer({ children }: AppDrawerProps) {
           <div className="px-4">
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 mb-2">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-2 p-2">
-              <Button variant="outline" size="sm" className="flex-col h-16 gap-1 rounded-xl border-dashed" onClick={() => navigate('/settings')}>
+              <Button variant="outline" size="sm" className="flex-col h-16 gap-1 rounded-xl border-dashed" onClick={handleWipeState}>
                 <Trash2 className="w-4 h-4 text-destructive" />
                 <span className="text-[10px]">Wipe State</span>
               </Button>
-              <Button variant="outline" size="sm" className="flex-col h-16 gap-1 rounded-xl border-dashed" onClick={() => window.location.reload()}>
+              <Button variant="outline" size="sm" className="flex-col h-16 gap-1 rounded-xl border-dashed" onClick={handleReboot}>
                 <RefreshCcw className="w-4 h-4 text-emerald-500" />
                 <span className="text-[10px]">Hard Reboot</span>
               </Button>

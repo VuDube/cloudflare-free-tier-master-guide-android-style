@@ -73,14 +73,17 @@ export function HomePage() {
       )}
       {categories.map(cat => (
         <section key={cat} className="space-y-4">
-          <h3 className={cn(
-            "text-[10px] font-bold uppercase tracking-[0.3em] pl-1",
-            cat === 'Compute' ? 'text-blue-500' :
-            cat === 'Storage' ? 'text-amber-500' :
-            cat === 'AI' ? 'text-purple-500' : 'text-emerald-500'
-          )}>
+          <motion.h3 
+            whileHover={{ x: 5 }}
+            className={cn(
+              "text-[10px] font-bold uppercase tracking-[0.3em] pl-1 cursor-default",
+              cat === 'Compute' ? 'text-blue-500' :
+              cat === 'Storage' ? 'text-amber-500' :
+              cat === 'AI' ? 'text-purple-500' : 'text-emerald-500'
+            )}
+          >
             {cat} Hub
-          </h3>
+          </motion.h3>
           <motion.div
             variants={container}
             initial="hidden"

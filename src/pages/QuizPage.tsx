@@ -6,25 +6,34 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, GraduationCap, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { chatService } from '@/lib/chat';
 export function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [showResult, setShowResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const currentQuestion = QUIZ_QUESTIONS[currentIndex];
-  const handleAnswer = (index: number) => {
+  const handleAnswer = async (index: number) => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(index);
+    const newScore = index === currentQuestion.correctIndex ? score + 1 : score;
     if (index === currentQuestion.correctIndex) {
-      setScore(s => s + 1);
+      setScore(newScore);
     }
-    setTimeout(() => {
+    setTimeout(async () => {
       if (currentIndex < QUIZ_QUESTIONS.length - 1) {
         setCurrentIndex(c => c + 1);
         setSelectedAnswer(null);
       } else {
         setIsFinished(true);
+        // Sync results to persistent agent metadata
+        await chatService.updateMetadata({
+          quizResult: {
+            score: newScore,
+            total: QUIZ_QUESTIONS.length,
+            completedAt: Date.now()
+          }
+        });
       }
     }, 1500);
   };
