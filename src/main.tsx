@@ -13,6 +13,9 @@ import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import '@/index.css'
 import { HomePage } from '@/pages/HomePage'
 import { TopicViewer } from '@/pages/TopicViewer'
+import { AiChatPage } from '@/pages/AiChatPage'
+import { BrowsePage } from '@/pages/BrowsePage'
+import { SettingsPage } from '@/pages/SettingsPage'
 import { AndroidShell } from '@/components/layout/AndroidShell'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -28,17 +31,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/browse",
-    element: <AndroidShell><div className="p-8 font-illustrative text-2xl">Browse Directory Coming Soon</div></AndroidShell>,
+    element: <AndroidShell><BrowsePage /></AndroidShell>,
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: "/ai-chat",
-    element: <AndroidShell><div className="p-8 font-illustrative text-2xl">AI Tools Interface Coming Soon</div></AndroidShell>,
+    element: <AndroidShell><AiChatPage /></AndroidShell>,
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: "/settings",
-    element: <AndroidShell><div className="p-8 font-illustrative text-2xl">App Settings Coming Soon</div></AndroidShell>,
+    element: <AndroidShell><SettingsPage /></AndroidShell>,
     errorElement: <RouteErrorBoundary />,
   }
 ]);
