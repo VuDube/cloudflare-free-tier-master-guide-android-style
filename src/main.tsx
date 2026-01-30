@@ -3,10 +3,7 @@ import { enableMapSet } from "immer";
 enableMapSet();
 import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
@@ -25,6 +22,8 @@ import { NetworkMapPage } from '@/pages/NetworkMapPage'
 import { SharePage } from '@/pages/SharePage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { LogsPage } from '@/pages/LogsPage'
+import { ArchitecturePage } from '@/pages/ArchitecturePage'
+import { TroubleshootingPage } from '@/pages/TroubleshootingPage'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -32,58 +31,21 @@ const router = createBrowserRouter([
     element: <AndroidShell />,
     errorElement: <RouteErrorBoundary />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "topic/:topicId",
-        element: <TopicViewer />,
-      },
-      {
-        path: "browse",
-        element: <BrowsePage />,
-      },
-      {
-        path: "ai-chat",
-        element: <AiChatPage />,
-      },
-      {
-        path: "settings",
-        element: <SettingsPage />,
-      },
-      {
-        path: "calculator",
-        element: <CalculatorPage />,
-      },
-      {
-        path: "quizzes",
-        element: <QuizPage />,
-      },
-      {
-        path: "templates",
-        element: <TemplatesPage />,
-      },
-      {
-        path: "dashboard",
-        element: <DashboardPage />,
-      },
-      {
-        path: "network",
-        element: <NetworkMapPage />,
-      },
-      {
-        path: "share",
-        element: <SharePage />,
-      },
-      {
-        path: "profile",
-        element: <ProfilePage />,
-      },
-      {
-        path: "logs",
-        element: <LogsPage />,
-      }
+      { index: true, element: <HomePage /> },
+      { path: "topic/:topicId", element: <TopicViewer /> },
+      { path: "browse", element: <BrowsePage /> },
+      { path: "ai-chat", element: <AiChatPage /> },
+      { path: "settings", element: <SettingsPage /> },
+      { path: "calculator", element: <CalculatorPage /> },
+      { path: "quizzes", element: <QuizPage /> },
+      { path: "templates", element: <TemplatesPage /> },
+      { path: "dashboard", element: <DashboardPage /> },
+      { path: "network", element: <NetworkMapPage /> },
+      { path: "share", element: <SharePage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "logs", element: <LogsPage /> },
+      { path: "architecture", element: <ArchitecturePage /> },
+      { path: "troubleshooting", element: <TroubleshootingPage /> }
     ]
   }
 ]);
