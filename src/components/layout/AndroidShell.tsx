@@ -83,7 +83,7 @@ export function AndroidShell() {
           {!isHome && (<button onClick={handleSync} className={cn("p-2 hover:bg-white/10 rounded-full transition-all active:rotate-180", isSyncing && "animate-spin")}><RefreshCw className="w-5 h-5" /></button>)}
         </header>
         <main className="flex-1 overflow-hidden relative bg-background">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div key={location.pathname} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="absolute inset-0 w-full h-full"><Outlet /></motion.div>
           </AnimatePresence>
         </main>
