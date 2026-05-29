@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Copy, ShieldCheck, Bug, CheckCircle2, FileCode } from 'lucide-react';
 import { toast } from 'sonner';
 import { chatService } from '@/lib/chat';
+import { cn } from '@/lib/utils';
 export function TopicViewer() {
   const { topicId } = useParams();
   const topic = topicId ? KNOWLEDGE_BASE[topicId] : null;
@@ -49,13 +50,15 @@ export function TopicViewer() {
       <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className={cn("grid w-full rounded-xl bg-muted/50 p-1 mb-6 h-auto", showConfigTab ? "grid-cols-6" : "grid-cols-5")}>
-              <TabsTrigger value="overview" className="text-[10px] py-2 font-bold uppercase">Brief</TabsTrigger>
-              <TabsTrigger value="limits" className="text-[10px] py-2 font-bold uppercase">Specs</TabsTrigger>
-              {showConfigTab && <TabsTrigger value="config" className="text-[10px] py-2 font-bold uppercase">Config</TabsTrigger>}
-              <TabsTrigger value="setup" className="text-[10px] py-2 font-bold uppercase">Steps</TabsTrigger>
-              <TabsTrigger value="practice" className="text-[10px] py-2 font-bold uppercase">Tips</TabsTrigger>
-              <TabsTrigger value="debug" className="text-[10px] py-2 font-bold uppercase">Debug</TabsTrigger>
+            <TabsList className={cn(
+              "flex w-full rounded-xl bg-muted/50 p-1 mb-6 h-auto overflow-x-auto no-scrollbar justify-start md:justify-center whitespace-nowrap",
+            )}>
+              <TabsTrigger value="overview" className="text-[10px] py-2 px-4 font-bold uppercase">Brief</TabsTrigger>
+              <TabsTrigger value="limits" className="text-[10px] py-2 px-4 font-bold uppercase">Specs</TabsTrigger>
+              {showConfigTab && <TabsTrigger value="config" className="text-[10px] py-2 px-4 font-bold uppercase">Config</TabsTrigger>}
+              <TabsTrigger value="setup" className="text-[10px] py-2 px-4 font-bold uppercase">Steps</TabsTrigger>
+              <TabsTrigger value="practice" className="text-[10px] py-2 px-4 font-bold uppercase">Tips</TabsTrigger>
+              <TabsTrigger value="debug" className="text-[10px] py-2 px-4 font-bold uppercase">Debug</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-6">
               <h3 className="font-illustrative text-xl underline decoration-primary/30 decoration-4 underline-offset-4">Executive Brief</h3>
@@ -139,7 +142,4 @@ export function TopicViewer() {
       </div>
     </div>
   );
-}
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
