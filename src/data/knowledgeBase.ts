@@ -13,6 +13,8 @@ export interface TopicDetail {
   related?: string[];
   bestPractices?: string[];
   commonErrors?: { code: string; message: string; fix: string }[];
+  neuronCosts?: Record<string, number>;
+  wranglerConfig?: string;
 }
 export interface QuizQuestion {
   id: string;
@@ -26,6 +28,18 @@ export interface CodeTemplate {
   title: string;
   stack: string[];
   codeSnippet: string;
+}
+export interface AutomationScript {
+  id: string;
+  title: string;
+  description: string;
+  command: string;
+}
+export interface WorkflowTemplate {
+  id: string;
+  title: string;
+  description: string;
+  steps: string[];
 }
 export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
   pages: {
@@ -57,7 +71,8 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       { code: 'Build Failed', message: 'Environment variable missing', fix: 'Check Settings > Variables in dashboard' }
     ],
     specs: { 'Build Limit': '500/mo', 'Max Domains': '100', 'SSL': 'Automatic' },
-    related: ['workers', 'kv']
+    related: ['workers', 'kv'],
+    wranglerConfig: `[[pages_build_output]]\ndirectory = "dist"\n\n[[functions]]\ndirectory = "./functions"`
   },
   workers: {
     id: 'workers',
@@ -84,68 +99,8 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       { code: '1015', message: 'Rate limited', fix: 'Verify usage doesn\'t exceed 100k/day' }
     ],
     specs: { 'Daily Quota': '100k requests', 'CPU Time': '10ms (Free)', 'Memory': '128MB' },
-    related: ['d1', 'r2', 'kv', 'durable-objects']
-  },
-  tunnel: {
-    id: 'tunnel',
-    title: 'Cloudflare Tunnel',
-    description: 'Securely connect local services to the edge.',
-    icon: 'Network',
-    color: '#03A9F4',
-    category: 'Security',
-    overview: 'Cloudflare Tunnel provides a secure way to connect your resources to Cloudflare without a publicly routable IP address.',
-    limits: [
-      'Unlimited tunnels',
-      'Unlimited bandwidth',
-      'Zero trust integration included',
-      'Standard concurrent connections'
-    ],
-    setupSteps: [
-      'Install cloudflared on your server',
-      'cloudflared tunnel create my-app',
-      'Configure config.yaml with ingress rules',
-      'cloudflared tunnel run my-app'
-    ],
-    bestPractices: [
-      'Run as a service for persistence',
-      'Use Access policies for security',
-      'Implement health check beacons'
-    ],
-    commonErrors: [
-      { code: 'Credentials Missing', message: 'Tunnel token invalid', fix: 'Run tunnel login or use token' }
-    ],
-    specs: { 'Encryption': 'TLS 1.3', 'Latency': 'Minimal Anycast', 'Routing': 'Private network' },
-    related: ['workers', 'turnstile']
-  },
-  stream: {
-    id: 'stream',
-    title: 'Cloudflare Stream',
-    description: 'Video infrastructure for applications.',
-    icon: 'Video',
-    color: '#E91E63',
-    category: 'Media',
-    overview: 'Stream is an end-to-end video solution. While primarily paid, the free-tier dashboard allows testing and management of assets.',
-    limits: [
-      'Testing quota enabled',
-      'Direct creator uploads',
-      'Adaptive bitrate included',
-      'Global delivery network'
-    ],
-    setupSteps: [
-      'Upload video via dashboard',
-      'Configure security settings',
-      'Embed using Stream Player JS'
-    ],
-    bestPractices: [
-      'Use HLS/Dash for mobile optimization',
-      'Implement signed URLs for private content',
-      'Utilize webhooks for encoding status'
-    ],
-    commonErrors: [
-      { code: 'Encoding Failed', message: 'Unsupported codec', fix: 'Use H.264/AAC standard' }
-    ],
-    specs: { 'Latency': 'Low-latency HLS', 'Formats': 'MP4, MOV, WebM', 'Storage': 'Cloudflare Managed' },
-    related: ['r2', 'images']
+    related: ['d1', 'r2', 'kv', 'durable-objects'],
+    wranglerConfig: `name = "my-worker"\nmain = "src/index.ts"\ncompatibility_date = "2025-04-24"\n\n[vars]\nENVIRONMENT = "production"`
   },
   ai: {
     id: 'ai',
@@ -170,7 +125,28 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
       { code: 'Out of Neurons', message: 'Daily quota exceeded', fix: 'Wait for reset or upgrade' }
     ],
     specs: { 'Daily Neurons': '30k', 'Model Access': 'Standard', 'Hardware': 'NVIDIA GPUs' },
-    related: ['vectorize', 'ai-gateway']
+    related: ['vectorize', 'ai-gateway'],
+    neuronCosts: {
+      '@cf/meta/llama-3.1-8b': 0.1,
+      '@cf/openai/whisper': 1.0,
+      '@cf/stabilityai/stable-diffusion-xl-base-1.0': 5.0,
+      '@cf/baai/bge-large-en-v1.5': 0.01
+    }
+  },
+  tunnel: {
+    id: 'tunnel',
+    title: 'Cloudflare Tunnel',
+    description: 'Securely connect local services to the edge.',
+    icon: 'Network',
+    color: '#03A9F4',
+    category: 'Security',
+    overview: 'Cloudflare Tunnel provides a secure way to connect your resources to Cloudflare without a publicly routable IP address.',
+    limits: ['Unlimited tunnels', 'Unlimited bandwidth', 'Zero trust integration', 'Standard concurrent connections'],
+    setupSteps: ['Install cloudflared', 'cloudflared tunnel create my-app', 'Configure config.yaml', 'Run tunnel'],
+    bestPractices: ['Run as service', 'Use Access policies', 'Health check beacons'],
+    commonErrors: [{ code: 'Credentials Missing', message: 'Tunnel token invalid', fix: 'Run tunnel login' }],
+    specs: { 'Encryption': 'TLS 1.3', 'Latency': 'Minimal', 'Routing': 'Private' },
+    related: ['workers', 'turnstile']
   },
   'durable-objects': {
     id: 'durable-objects',
@@ -180,24 +156,25 @@ export const KNOWLEDGE_BASE: Record<string, TopicDetail> = {
     color: '#F38020',
     category: 'Compute',
     overview: 'Durable Objects provide low-latency state and coordination for your Workers, enabling real-time features.',
-    limits: [
-      '1,000,000 requests (Shared Free Quota)',
-      '128MB memory per object',
-      'Unlimited storage via State API'
-    ],
+    limits: ['1,000,000 requests (Shared)', '128MB memory per object', 'Unlimited storage'],
     setupSteps: ['Define class', 'Add binding to wrangler.toml', 'Call env.DO.get(id)'],
-    bestPractices: [
-      'Keep state objects small',
-      'Use alarm API for scheduled tasks',
-      'Minimize global state locks'
-    ],
-    commonErrors: [
-      { code: 'Storage Error', message: 'State size exceeded 128MB', fix: 'Shard state across IDs' }
-    ],
+    bestPractices: ['Small state objects', 'Use alarm API', 'Minimize locks'],
+    commonErrors: [{ code: 'Storage Error', message: 'Size exceeded', fix: 'Shard state' }],
     specs: { 'Shared Quota': '1M reqs', 'Isolation': 'Single-threaded', 'Consistency': 'Strong' },
     related: ['workers', 'workflows']
   }
 };
+export const AUTOMATION_SCRIPTS: AutomationScript[] = [
+  { id: 'd1-mig', title: 'D1 Migration', description: 'Apply pending SQL migrations.', command: 'wrangler d1 migrations apply my-db --remote' },
+  { id: 'kv-bulk', title: 'KV Bulk Write', description: 'Populate KV from JSON file.', command: 'wrangler kv:key put --binding=MY_KV "key" "value"' },
+  { id: 'r2-life', title: 'R2 Lifecycle', description: 'Set object expiration rules.', command: 'wrangler r2 bucket lifecycle set my-bucket --file lifecycle.json' }
+];
+export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
+  { id: 'rag-flow', title: 'RAG Pipeline', description: 'Ingest docs to Vectorize.', steps: ['Fetch PDF', 'Chunk Text', 'Generate Embeddings', 'Upsert Vectorize'] },
+  { id: 'batch-proc', title: 'Batch Media', description: 'Process R2 uploads.', steps: ['Listen R2 Event', 'Trigger Worker', 'Resize Image', 'Notify Webhook'] },
+  { id: 'edge-cache', title: 'Edge Prefetch', description: 'Warm global cache.', steps: ['Identify Hot Assets', 'Dispatch Workers', 'Fetch to Cache', 'Verify P95'] },
+  { id: 'lora-inf', title: 'LoRA Inference', description: 'Custom fine-tuned LLM.', steps: ['Load Base Llama 3', 'Apply LoRA Weights', 'Stream Response', 'Log Neurons'] }
+];
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 'q1',

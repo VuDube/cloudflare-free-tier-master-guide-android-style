@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, AlertCircle, Sparkles, UserCheck, Shield, Database, Cpu } from 'lucide-react';
+import { Send, Bot, User, AlertCircle, Sparkles, UserCheck, Shield, Database, Cpu, Table as TableIcon, Workflow, ChevronDown, ChevronUp } from 'lucide-react';
 import { chatService } from '@/lib/chat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { KNOWLEDGE_BASE, WORKFLOW_TEMPLATES } from '@/data/knowledgeBase';
 import { cn } from '@/lib/utils';
 import type { Message } from '../../worker/types';
 export function AiChatPage() {
@@ -12,11 +14,12 @@ export function AiChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [streamingResponse, setStreamingResponse] = useState('');
   const [persona, setPersona] = useState('General');
+  const [showNeuronCosts, setShowNeuronCosts] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const personas = [
     { name: 'General', prompt: 'You are a general Cloudflare expert.', icon: UserCheck },
     { name: 'Architect', prompt: 'You are a Database Architect specializing in D1 and R2.', icon: Database },
-    { name: 'SecOps', prompt: 'You are a DevSecOps specialist focusing on Turnstile and Tunnels.', icon: Shield },
+    { name: 'Workflows', prompt: 'You are an Automation expert. Help me build Cloudflare Workflows.', icon: Workflow },
     { name: 'AI Expert', prompt: 'You are an AI Researcher helping with Workers AI and Vectorize.', icon: Cpu }
   ];
   useEffect(() => { loadMessages(); }, []);
@@ -41,12 +44,11 @@ export function AiChatPage() {
     setStreamingResponse('');
     const personaPrompt = personas.find(p => p.name === persona)?.prompt || '';
     const fullMessage = `Persona Context: ${personaPrompt}\n\nUser Question: ${userMessage}`;
-    // Optimistic UI update
-    setMessages(prev => [...prev, { 
-      id: crypto.randomUUID(), 
-      role: 'user', 
-      content: userMessage, 
-      timestamp: Date.now() 
+    setMessages(prev => [...prev, {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: userMessage,
+      timestamp: Date.now()
     }]);
     try {
       await chatService.sendMessage(fullMessage, undefined, (chunk) => {
@@ -60,40 +62,93 @@ export function AiChatPage() {
       setIsTyping(false);
     }
   };
+  const injectWorkflow = (wfId: string) => {
+    const wf = WORKFLOW_TEMPLATES.find(w => w.id === wfId);
+    if (wf) {
+      handleSend(`I want to implement the ${wf.title} workflow. Its steps are: ${wf.steps.join(' -> ')}. Can you help me write the Worker code for this?`);
+    }
+  };
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950">
-      <div className="p-3 border-b bg-background flex gap-2 overflow-x-auto no-scrollbar shrink-0">
-        {personas.map(p => (
-          <button
-            key={p.name}
-            onClick={() => setPersona(p.name)}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-full border-2 transition-all whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter",
-              persona === p.name ? "bg-primary border-primary text-primary-foreground" : "bg-muted/50 border-slate-200 dark:border-slate-800 text-muted-foreground"
-            )}
-          >
-            <p.icon size={12} />
-            {p.name}
-          </button>
-        ))}
+      <div className="p-3 border-b bg-background flex flex-col gap-3 shrink-0">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          {personas.map(p => (
+            <button
+              key={p.name}
+              onClick={() => setPersona(p.name)}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-full border-2 transition-all whitespace-nowrap text-[10px] font-bold uppercase tracking-tighter",
+                persona === p.name ? "bg-primary border-primary text-primary-foreground" : "bg-muted/50 border-slate-200 dark:border-slate-800 text-muted-foreground"
+              )}
+            >
+              <p.icon size={12} />
+              {p.name}
+            </button>
+          ))}
+        </div>
+        <button 
+          onClick={() => setShowNeuronCosts(!showNeuronCosts)}
+          className="flex items-center justify-between px-3 py-2 bg-slate-100 dark:bg-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+        >
+          <div className="flex items-center gap-2"><TableIcon size={12} /> Neuron Cost Reference</div>
+          {showNeuronCosts ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        </button>
+        <AnimatePresence>
+          {showNeuronCosts && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }} 
+              animate={{ height: 'auto', opacity: 1 }} 
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="border rounded-xl overflow-hidden mt-1">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow>
+                      <TableHead className="text-[9px] h-8">Model</TableHead>
+                      <TableHead className="text-[9px] h-8 text-right">Cost/Req</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(KNOWLEDGE_BASE.ai.neuronCosts || {}).map(([model, cost]) => (
+                      <TableRow key={model} className="h-8">
+                        <TableCell className="text-[9px] py-1 font-mono">{model.split('/').pop()}</TableCell>
+                        <TableCell className="text-[9px] py-1 text-right font-bold text-primary">{cost}N</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {persona === 'Workflows' && (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            {WORKFLOW_TEMPLATES.map(wf => (
+              <Button 
+                key={wf.id} 
+                variant="outline" 
+                size="sm" 
+                className="text-[9px] h-7 rounded-lg border-dashed border-primary/40 hover:bg-primary/5 text-primary"
+                onClick={() => injectWorkflow(wf.id)}
+              >
+                + {wf.title}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="bg-amber-50 dark:bg-amber-950/30 px-4 py-2 flex items-center justify-between border-b border-amber-200/50">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
           <p className="text-[9px] text-amber-800 dark:text-amber-200 uppercase font-bold tracking-widest">AI Quota Policy v2.5</p>
         </div>
-        <div className="flex gap-2">
-          {['D1', 'KV', 'AI'].map(t => <span key={t} className="text-[8px] font-bold text-amber-600 border border-amber-600/30 px-1 rounded">{t}</span>)}
-        </div>
       </div>
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar scroll-smooth">
         {messages.length === 0 && !isTyping && (
           <div className="h-full flex flex-col items-center justify-center text-center opacity-40 space-y-6">
             <Bot size={64} className="text-primary animate-pulse" />
-            <div className="space-y-2">
-              <p className="font-illustrative text-2xl uppercase">Expert Studio</p>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-[0.2em]">Persona: {persona}</p>
-            </div>
+            <p className="font-illustrative text-2xl uppercase">Expert Studio</p>
           </div>
         )}
         {messages.map((msg) => (
@@ -122,12 +177,12 @@ export function AiChatPage() {
       </div>
       <div className="p-4 bg-background border-t">
         <form onSubmit={(e) => handleSend(undefined, e)} className="flex gap-2 items-center">
-          <Input 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
-            placeholder={`Consult ${persona}...`} 
-            className="rounded-full bg-slate-100 dark:bg-slate-900 border-none px-6 focus-visible:ring-primary h-12" 
-            disabled={isTyping} 
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={`Consult ${persona}...`}
+            className="rounded-full bg-slate-100 dark:bg-slate-900 border-none px-6 focus-visible:ring-primary h-12"
+            disabled={isTyping}
           />
           <Button type="submit" size="icon" className="rounded-full shrink-0 h-12 w-12" disabled={!input.trim() || isTyping}>
             <Send size={20} />

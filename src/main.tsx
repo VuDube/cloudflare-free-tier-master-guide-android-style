@@ -24,6 +24,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { LogsPage } from '@/pages/LogsPage'
 import { ArchitecturePage } from '@/pages/ArchitecturePage'
 import { TroubleshootingPage } from '@/pages/TroubleshootingPage'
+import { PlaybookPage } from '@/pages/PlaybookPage'
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -45,7 +46,8 @@ const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> },
       { path: "logs", element: <LogsPage /> },
       { path: "architecture", element: <ArchitecturePage /> },
-      { path: "troubleshooting", element: <TroubleshootingPage /> }
+      { path: "troubleshooting", element: <TroubleshootingPage /> },
+      { path: "playbook", element: <PlaybookPage /> }
     ]
   }
 ]);
